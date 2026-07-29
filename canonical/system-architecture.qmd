@@ -1,0 +1,365 @@
+---
+title: "GMD AI-Assisted Harmonization System"
+subtitle: "Canonical System Architecture, Governance, and Artifact Contracts"
+author: "GMD Harmonization Team"
+date: "2026-07-29"
+date-format: "MMMM D, YYYY"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    theme: cosmo
+execute:
+  echo: false
+  warning: true
+---
+
+::: {.callout-important}
+## Document authority
+
+This is the canonical description of the logical system. It governs system
+behavior, trust boundaries, human approval, lifecycle transitions, and the
+minimum contracts between components. The canonical GMD schema remains the
+authority for statistical definitions. Infrastructure products are governed
+by `infrastructure-requirements.qmd` and are not fixed by this document.
+:::
+
+# Purpose and status
+
+The GMD AI-assisted harmonization system is intended to reduce the repetitive
+work required to interpret and standardize household survey microdata while
+preserving methodological authority, reproducibility, and auditability.
+
+The system separates three responsibilities:
+
+1. AI-assisted interpretation produces structured proposals and diagnostics.
+2. Human experts make and approve methodological decisions.
+3. Fixed, versioned code executes approved decisions deterministically.
+
+This document consolidates the stable logic found across the project's concept
+notes, process narratives, infrastructure requests, and presentations. Where
+those drafts conflicted, this document adopts the stricter governance rule and
+records unresolved matters explicitly.
+
+::: {.callout-note}
+## Terminology
+
+This repository uses **Global Micro Database (GMD)**, matching the project
+charter. Archived drafts also use "Global Monitoring Database."
+[VERIFY: confirm the official expansion of GMD and the accountable program
+owner before external publication.]
+:::
+
+# Scope
+
+## Objectives
+
+The system is designed to:
+
+- shorten the time between survey intake and a reviewable harmonization draft;
+- improve consistency across surveys and waves;
+- make mappings, transformations, overrides, and reasons explicit;
+- execute accepted logic reproducibly;
+- preserve quality-assured decisions as searchable institutional knowledge;
+  and
+- support a controlled transition away from opaque survey-specific scripts.
+
+These are intended outcomes, not measured benefits. Efficiency or quality
+claims require a defined evaluation and evidence from the proof of concept.
+
+## Non-goals
+
+The system is not intended to:
+
+- delegate final methodological authority to an AI model;
+- execute unapproved logic in production;
+- infer a new GMD methodology from historical frequency;
+- treat a past decision as binding when it conflicts with the current schema;
+- put methodology exclusively in model weights or prompts;
+- store raw microdata in this architecture repository; or
+- select cloud products before institutional, security, and operational review.
+
+# Architecture invariants
+
+The following properties are mandatory unless the accountable governance body
+formally changes this architecture:
+
+1. **Schema authority.** The approved GMD schema and methodology override
+   historical precedents, model suggestions, and implementation convenience.
+2. **Human authority.** An accountable human expert approves every
+   methodological specification before production execution.
+3. **Separation of decision and execution.** AI may propose and diagnose;
+   deterministic code applies the exact approved specification.
+4. **Immutable approval.** Approval applies to one content-addressed version.
+   Any change to mappings, transformations, rules, or executable logic creates
+   a new version and requires approval again.
+5. **Reproducible lineage.** A production result identifies immutable input
+   versions, specification version and hash, schema version, engine version,
+   configuration, dependency environment, and QA policy version.
+6. **Explicit failure.** Missing required inputs, invalid contracts, failed
+   checks, and unresolved ambiguities stop or route the workflow visibly. They
+   do not trigger silent defaults.
+7. **Controlled model boundary.** Raw respondent-level microdata is not sent to
+   a language model by default. Any exception requires documented data-owner,
+   security, and infrastructure approval.
+8. **Governed learning.** Only human-approved decisions that pass the required
+   QA and precedent-admission checks can enter the reusable precedent base.
+9. **Auditability.** Material inputs, model outputs, review actions, execution
+   events, QA results, and publication decisions have attributable records.
+10. **Repository separation.** This hub documents the system but does not store
+    operational code, secrets, or survey data.
+
+# System context and ownership
+
+The system consists of capabilities, not necessarily one application or one
+repository. Product and repository boundaries may change without changing the
+logical architecture.
+
+| Capability | Owns | Must not own |
+|---|---|---|
+| Canonical GMD schema | Variable definitions, derivation rules, constraints, schema versions | Survey-specific proposals or historical exceptions |
+| Intake and profiling | Source registration, immutable file identity, deterministic data profiles | Methodological approval |
+| Documentation extraction | Structured metadata with provenance and extraction confidence | Unreviewed claims that extracted metadata is official DDI |
+| Historical precedents | Searchable approved decisions and their lineage | Canonical methodology |
+| Drafting and diagnosis | Candidate mappings, evidence, uncertainty, bounded diagnostics | Approval or production authorization |
+| Human review | Acceptance, rejection, correction, justification, sign-off | Silent mutation of already approved versions |
+| Harmonization engine | Deterministic application of an authorized specification | Interpretation or discretionary fallback |
+| QA and publication | Versioned checks, explicit disposition, release record | Automatic acceptance of failed output |
+| Harmonization Hub | Cross-system architecture, contracts, decisions, rationale | Pipeline code or microdata |
+
+[VERIFY: add the physical repository URL, methodological owner, technical
+owner, and support owner for each capability before implementation handoff.]
+
+# Information sources and authority
+
+The drafting process draws on four source classes:
+
+| Source | Role | Authority |
+|---|---|---|
+| Raw survey microdata | Factual record of observed values and structure | Authoritative for what the delivered file contains, subject to provenance checks |
+| Survey documentation | Meaning, questionnaire design, codes, universe, and methodology | Source-dependent; preserve provenance and uncertainty |
+| Canonical GMD schema and guidelines | Target definitions, constraints, and derivations | Binding |
+| Approved historical decisions | Relevant examples and expert reasoning from prior cases | Advisory |
+
+Retrieved precedents must carry citations to their originating approval and QA
+records. A precedent that conflicts with the current schema is flagged; it is
+never used to override the schema.
+
+# Trust boundaries and data flow
+
+Different components need different views of survey information. Access must be
+least-privilege and based on classification rather than convenience.
+
+| Information | Controlled storage | Profiler or executor | Model service | Human reviewer |
+|---|---:|---:|---:|---:|
+| Raw respondent-level microdata | Required | Allowed in approved environment | Prohibited by default | Only through approved analytical access |
+| Survey documents and DDI | Required | Allowed | Open pending classification and model-service approval | Allowed according to source controls |
+| Aggregated data profile | Required | Produced | Open pending field-level disclosure policy | Allowed according to classification |
+| Canonical schema | Required | Allowed | Allowed | Allowed |
+| Approved precedents | Required | Allowed as needed | Allowed subject to classification | Allowed |
+| Draft and approved specifications | Required | Draft only in sandbox; approved in production | Draft access only | Allowed |
+| Diagnostics and logs | Required with retention controls | Produced | Only an approved, minimized diagnostic subset | Allowed by role |
+
+An AI-controlled process may request sandbox execution, but the sandbox executor
+is the component that reads microdata. Only diagnostics allowed by the data-flow
+policy may return to the model. The exact aggregation, suppression, logging, and
+retention rules are open infrastructure and data-governance decisions.
+
+# Canonical lifecycle
+
+The lifecycle is a state machine. Inputs are sources, not stages, and feedback
+loops are transitions rather than additional stage numbers.
+
+```{mermaid}
+flowchart TD
+    I[Intake and register sources] --> P[Profile data and structure documentation]
+    P --> D[Draft specification]
+    D --> T[Bounded pre-approval validation or sandbox testing]
+    T -->|criteria met or stop condition| R[Human review]
+    T -->|repair permitted| D
+    R -->|reject with reason| D
+    R -->|approve exact version| E[Deterministic production execution]
+    E --> Q[Quality assurance]
+    Q -->|pass| U[Publish output and audit record]
+    Q -->|fail| X[Human disposition]
+    X -->|unchanged technical retry| E
+    X -->|logic change required| D
+    U --> A[Precedent admission review]
+    A -->|admit| H[Approved precedent base]
+    A -->|do not admit| Z[Retain run lineage only]
+```
+
+## Intake and structuring
+
+The system registers source files with stable identifiers, hashes, provenance,
+classification, and access policy. Deterministic profiling summarizes the raw
+data. Documentation extraction produces structured metadata while retaining a
+link to the original source and extraction confidence.
+
+Extracted documentation must not be called a standards-compliant DDI merely
+because it resembles one. DDI conformance requires validation against the
+applicable standard and review of provenance.
+
+## Drafting and bounded pre-approval testing
+
+The drafting component receives only approved inputs: the data profile,
+structured documentation, relevant precedents, and canonical rules. It produces
+a versioned draft specification with uncertainty and evidence visible.
+
+A draft can be syntactically executable while remaining unauthorized. This
+resolves an ambiguity in older drafts: a controlled sandbox may test a draft,
+but production may execute only an approved version. Sandbox iteration must be
+bounded by maximum attempts, time or cost limits, permitted changes, and stop
+conditions for conceptual ambiguity.
+
+## Human review and approval
+
+The reviewer can approve, reject, or amend each proposed decision. An amendment
+creates a new draft version. Approval binds the reviewer, timestamp, comments,
+schema version, and exact specification hash.
+
+Approval is not inferred from file location, a filename, a UI state, or the
+absence of objections. It is an explicit record checked by the production
+orchestrator.
+
+## Deterministic execution
+
+The production engine verifies authorization, compatibility, and hashes before
+running. It applies the approved mappings and transformations without model
+inference or discretionary fallback.
+
+Determinism depends on the full execution manifest, not the specification alone.
+The same input bytes, specification, engine, dependencies, configuration, and
+runtime policy must be reproducible.
+
+## Quality assurance and failure disposition
+
+QA compares the output with versioned structural, logical, and plausibility
+rules. A failed check produces a report and blocks publication unless an
+explicit, authorized exception process is later defined.
+
+Automatic retries are permitted only when approved logic and material inputs do
+not change, for example after a transient infrastructure failure. Any repair to
+the specification, generated code, rule set, or transformation returns to draft
+status and requires reapproval. This rule supersedes archived slides that allow
+an AI agent to revise post-approval logic without human input.
+
+## Publication and precedent admission
+
+Publication records output hashes, lineage, QA results, approval, and release
+status. Precedent admission is a separate gate. A decision becomes reusable only
+if it:
+
+- originates from an approved specification;
+- is associated with a successful QA disposition;
+- retains evidence, applicability context, and reviewer attribution;
+- is not superseded or known to conflict with current methodology; and
+- passes any additional curation criteria established by the methodology owner.
+
+# Artifact contracts
+
+The following contracts are implementation-neutral minimums. Their formal JSON
+Schema or equivalent definitions belong with the component that implements
+them, while this hub records the cross-system obligations.
+
+| Artifact | Required minimum content |
+|---|---|
+| Survey source bundle | Survey ID, source URI, file hashes, format, provenance, classification, acquisition date, version |
+| Data profile | Contract version, source hashes, variable metadata, approved aggregate statistics, disclosure controls, profiler version |
+| Documentation record | Contract version, source references, extracted fields, confidence, language, parser version, DDI validation status |
+| Harmonization specification | Contract and schema versions, survey ID, parent version, lifecycle state, source and target fields, transformation, evidence, uncertainty, validations, content hash |
+| Approval record | Specification hash, reviewer identity, decision, timestamp, scope, comments, attestation method |
+| Execution manifest | Run ID, input hashes, approved specification hash, engine and dependency versions, configuration, environment identity, timestamps |
+| QA report | Run ID, QA policy version, checks, results, severity, evidence, overall disposition |
+| Publication record | Output hashes, release status, approval and QA references, location, publication timestamp |
+| Audit event | Event ID, actor, action, object and version, timestamp, outcome, correlation ID |
+| Precedent record | Source decision, approval and QA lineage, context, evidence, applicability, embedding version if used, supersession status |
+
+## Harmonization specification states
+
+The minimum lifecycle states are:
+
+- `draft`: editable and not authorized;
+- `in_review`: frozen for a review action and not authorized;
+- `approved`: immutable and authorized within its recorded scope;
+- `rejected`: not authorized, with a reason;
+- `superseded`: formerly approved but replaced for future runs; and
+- `withdrawn`: no longer authorized because of a discovered issue.
+
+Production authorization requires `approved` status, an exact hash match, a
+valid approval record, and compatibility with the selected schema and engine.
+
+## Mapping granularity
+
+Archived presentation material proposes mapping the most atomic observable
+concepts and deriving aggregate or categorical outputs through canonical rules.
+This can improve consistency and maintainability, but it is a **Proposed**
+methodological design rule until the schema owner confirms its applicability to
+each module. The same applies to the archived Situation A/B/C classification of
+direct, inferred, and not-mappable cases.
+
+# Roles and decision rights
+
+| Decision | Accountable authority | Required consultation |
+|---|---|---|
+| Statistical definition or derivation | GMD methodology owner | Harmonizers, schema maintainers |
+| Survey-specific mapping | Designated expert reviewer | Drafting evidence and precedents |
+| Specification contract | Methodology and technical owners jointly | Engine, review, QA, and audit owners |
+| Production release | Authorized operational owner | Reviewer and QA owner |
+| Precedent admission or withdrawal | Methodology or delegated curation owner | Reviewer, QA owner |
+| Trust-boundary exception | Data owner and security authority | Methodology and technical owners |
+| Infrastructure product selection | Authorized ITS and project owners | Security, operations, development team |
+| Canonical architecture change | Methodology and technical owners jointly | Affected component owners |
+
+# Proof-of-concept boundary
+
+The archived drafts consistently propose beginning with non-welfare demographic
+modules and excluding income and consumption aggregates until the approach is
+evaluated. This remains **Proposed**, not an approved production scope.
+
+A proof of concept should measure at least:
+
+- contract validity and execution success;
+- reviewer correction and rejection patterns;
+- time to a reviewed decision compared with an agreed baseline;
+- error detection before and after human review;
+- consistency across related surveys and waves;
+- retrieval relevance and citation accuracy;
+- reproducibility from the execution manifest; and
+- security, cost, and operational failure behavior.
+
+Claims about annual survey volume, time savings, accuracy improvements, or
+production readiness must be sourced before they appear in stakeholder material.
+
+# Decision register
+
+| ID | Decision | Status | Basis or next action |
+|---|---|---|---|
+| A-001 | AI is advisory; humans retain methodological authority | Invariant | Project charter and all substantive drafts |
+| A-002 | Production uses only an exact approved specification and deterministic engine | Invariant | Project charter and concept note |
+| A-003 | Canonical schema overrides precedents | Invariant | Repeated across source drafts |
+| A-004 | Changes to approved logic require reapproval | Invariant | Resolves proposal and slide conflict |
+| A-005 | Raw microdata is not sent to a model by default | Invariant | Conservative trust boundary; exceptions require approval |
+| A-006 | Map atomic concepts and derive aggregates deterministically | Proposed | Requires schema-owner confirmation by module |
+| A-007 | Initial scope is non-welfare demographic variables | Proposed | Requires sponsor and methodology-owner approval |
+| A-008 | Physical repositories and named owners implement each capability | Open | Complete the ownership map |
+| A-009 | Formal specification and interface schemas | Open | Define and version contracts before coding |
+| A-010 | QA exception and publication policy | Open | Define authority, severity, and disposition rules |
+
+# Open work before implementation
+
+1. Confirm official terminology, project sponsorship, and decision owners.
+2. Complete the repository and ownership map.
+3. Ratify the proof-of-concept scope and evaluation design.
+4. Define formal schemas for the source bundle, profile, documentation record,
+   specification, approval, execution, QA, and precedent artifacts.
+5. Define field-level data classifications and permitted model payloads.
+6. Define QA severity, exception, publication, and withdrawal policies.
+7. Resolve the infrastructure decisions and institutional approvals recorded in
+   `infrastructure-requirements.qmd`.
+
+---
+
+*Canonical version 1.0. Consolidated from archived project drafts on
+2026-07-29.*

@@ -33,3 +33,6 @@
 
 # Compound GPID local config (user-specific, never commit)
 compound-gpid.local.md
+
+# Generated documentation outputs
+build/
