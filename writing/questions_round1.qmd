@@ -1,0 +1,147 @@
+## Questions for ITS: AI-Assisted GMD Harmonization (Azure + AKS)
+
+### 0) Context for ITS (one paragraph you can include)
+
+We are designing an AI-assisted workflow to harmonize household survey microdata into the Global Micro Database (GMD). The workflow runs deterministic profiling, harmonization, and QA jobs in AKS; stores raw data, documentation, outputs, and audit artifacts in Azure storage; and uses an AI service only for advisory interpretation and draft mapping/specification generation (with mandatory human approval before production execution). We need to understand what is feasible in our Azure + AKS environment and what constraints we must design around.
+
+---
+
+## A. Data storage, access, and governance (Requirements #1, #10)
+
+1. **Where should we store restricted microdata?**
+   Do we have an approved Azure storage option for restricted/controlled data (e.g., ADLS Gen2 / Blob) that our AKS jobs can access?
+
+2. **Immutability/versioning for raw surveys:**
+   Can the storage be configured so raw survey files are never overwritten (versioning / immutable policies / append-only practices)? If not, what is the approved alternative to guarantee reproducibility?
+
+3. **Private access only:**
+   Can storage be restricted to private network access (no public endpoints) and accessed only from approved compute (AKS)?
+
+4. **Access control model:**
+   What is the recommended way to grant our AKS jobs access to storage (managed identity, service principal, etc.)? And can access be scoped per folder/container (raw vs outputs vs artifacts)?
+
+5. **Audit logs:**
+   Are there standard audit/logging requirements for access to restricted microdata (who accessed what, when)? Can we enable them for this storage location?
+
+6. **Data retention:**
+   Are there retention rules we must follow for raw surveys, outputs, and logs? Any constraints on retaining derived datasets?
+
+---
+
+## B. AKS compute environment for profiling/harmonization/QA (Requirements #2, #3, #8, #9)
+
+7. **AKS availability:**
+   Do we have an AKS cluster we can use, or would one need to be provisioned? If we can use an existing one, what is the process to onboard?
+
+8. **Namespaces / environments:**
+   Can we get separate environments (or namespaces) for:
+
+* dev/sandbox (experimentation),
+* and production (locked-down runs)?
+  If not, what is the recommended segregation approach?
+
+9. **Running batch jobs:**
+   What is the standard mechanism in our environment to run scheduled or on-demand batch jobs in AKS (e.g., Kubernetes Jobs/CronJobs, internal scheduler)?
+
+10. **Compute sizing:**
+    What limits exist on CPU and memory per job? Are there recommended resource quotas we should plan for, given that some household surveys are large?
+
+11. **Container image registry:**
+    Do we have an approved container registry (e.g., Azure Container Registry) to store images for profiling, harmonization engine, and QA?
+
+12. **Outbound network restrictions:**
+    Do AKS jobs have outbound internet access by default? If restricted, what is the allowlist process (important for calling AI services, package repos, etc.)?
+
+---
+
+## C. Secrets and identity management (Requirements #2, #4, #6, #10)
+
+13. **Authentication pattern:**
+    What is the recommended way for AKS workloads to authenticate to Azure services (storage, search, AI)—managed identity preferred?
+
+14. **Secret storage:**
+    If we need API keys (e.g., for AI services), what is the approved method to store and inject secrets into AKS jobs (Key Vault, CSI driver, etc.)?
+
+15. **Key rotation & governance:**
+    Are there standard requirements for key rotation, secret access approvals, or audit trails?
+
+---
+
+## D. AI service feasibility and compliance (Requirements #4, #6)
+
+16. **AI service availability:**
+    Do we have access to Azure OpenAI / Azure AI Foundry in our tenant/subscription? If yes, which regions are approved?
+
+17. **Data policy for AI usage:**
+    What types of data are permitted to be sent to an AI service?
+
+* Are survey profiles allowed (variable names, labels, distributions)?
+* Are questionnaire excerpts allowed?
+* Is any row-level microdata allowed (we prefer to avoid it by design)?
+
+18. **Private endpoints / network controls:**
+    If AI services are approved, can we access them via private endpoints (or are public endpoints acceptable under policy)?
+
+19. **Quota constraints:**
+    What are the quota limits (requests/minute, tokens/minute) and what is the process to request increases?
+
+20. **Logging requirements for AI prompts/outputs:**
+    Are there constraints on storing prompts and model outputs (which may contain metadata from surveys)? Where should these logs live?
+
+---
+
+## E. “Institutional memory” and search/retrieval (Requirements #5)
+
+21. **Approved searchable store:**
+    Do we have an approved service to index and search:
+
+* past harmonization specs,
+* QA outcomes,
+* documentation text (questionnaires/codebooks),
+* and metadata?
+  (Example: Azure AI Search; alternatives are fine.)
+
+22. **Vector search feasibility:**
+    If we want similarity-based retrieval (find “similar surveys”), can we use vector search capabilities? If yes, what service is recommended in our environment?
+
+23. **Database for structured metadata:**
+    What is the standard service for storing structured metadata (e.g., survey registry, run registry): Azure SQL, Postgres, something else?
+
+---
+
+## F. Sandbox environment for iterative AI build–test–repair (optional, Requirement #6)
+
+24. **Can we run a sandboxed environment in AKS?**
+    We may run an iterative “build–test–repair” loop that executes harmonization+QA repeatedly before human approval. Can we create an isolated namespace with tighter controls (quotas, no outbound network, restricted data access)?
+
+25. **Data access restrictions in sandbox:**
+    Can sandbox jobs access only a limited subset of data (e.g., a copy of a survey in a restricted folder) so production raw storage is protected?
+
+26. **Operational constraints:**
+    Are there policies against automated iterative jobs (many runs), or any monitoring/cost controls we must implement?
+
+---
+
+## G. Monitoring, logging, and CI/CD (Requirements #2, #10)
+
+27. **Monitoring standard:**
+    What is the standard approach for job monitoring and logs (Azure Monitor / Log Analytics)? Can our AKS namespace be onboarded?
+
+28. **Run audit artifacts:**
+    Where should we store run manifests (what ran, inputs, spec version, outputs, QA results) so they are retained and auditable?
+
+29. **CI/CD pipeline:**
+    What is the recommended pipeline tool (Azure DevOps, GitHub Enterprise, etc.) for building containers and deploying to AKS?
+
+---
+
+## H. Practical “feasibility answers” we need from ITS (explicit ask)
+
+To design a realistic pilot, we need clear answers to the following:
+
+30. Can we store restricted microdata in Azure storage accessible by AKS under WB policies?
+31. Can we run AKS batch jobs with access to that storage in a locked-down environment?
+32. Can we use an approved AI service (Azure OpenAI/Foundry), and what data are we allowed to send to it?
+33. Can we provision a searchable “institutional memory” store (specs + QA + docs) for retrieval?
+34. What is the simplest approved setup for a pilot in the next few months?
+

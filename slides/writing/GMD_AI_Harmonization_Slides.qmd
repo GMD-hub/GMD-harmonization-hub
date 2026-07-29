@@ -1,0 +1,719 @@
+---
+date: "May 2026"
+lang: en
+format:
+  revealjs:
+    theme: [dark, custom-dark.scss]
+    css: ../../assets/css/tachyons.min.css
+    highlight-style: arrow-dark
+    width: 1600
+    height: 900
+    margin: 0.08
+    slide-number: c/t
+    progress: true
+    hash: true
+    transition: fade
+    background-transition: fade
+    navigation-mode: linear
+    controls: true
+    controls-layout: bottom-right
+    embed-resources: true
+    fig-responsive: false
+    mermaid:
+      theme: dark
+    appearance:
+      autoappear: true
+      autoelements: "{'h2': {'animation':'animate__fadeInDown'}, 'ul li': {'animation':'animate__fadeInLeft'}}"
+      appearparents: true
+revealjs-plugins:
+  - appearance
+filters:
+   - roughnotation
+---
+
+::: {.center}
+
+# AI-Assisted<br/>GMD Harmonization
+
+GPID Team · {{< meta date >}}
+
+:::
+
+::: {.notes}
+We'll cover why we're building this, what it does, how it works step by step, and what it means for us day-to-day work as a harmonizer. There's no assumption of technical background — we'll define every term as we go.
+:::
+
+```{r}
+#| include: false
+embed_gmd_spec <- function(
+  path = "../sdydstem_seeds/gmd_spec_template.yml",
+  display_path = "sdydstem_seeds/gmd_spec_template.yml"
+) {
+  if (!file.exists(path)) {
+    rlang::abort(c(
+      "Could not read local GMD specification template.",
+      "x" = paste0("File does not exist: ", path),
+      "i" = "The path is relative to the slide file's render directory."
+    ))
+  }
+
+  lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
+
+  fence <- c(
+    paste0(
+      "```{.yaml .gmd-spec-embed .code-overflow-scroll filename=\"",
+      display_path,
+      "\"}"
+    ),
+    lines,
+    "```"
+  )
+
+  return(knitr::asis_output(paste(fence, collapse = "\n")))
+}
+```
+
+
+
+# The Problem {background-color="#0f1f3d"}
+
+## The Problem {#slide-problem background-color="#0f1f3d"}
+
+:::: {.problem-grid}
+
+::: {.problem-card .p-amber .fragment}
+[🧠 Tacit Knowledge]{.problem-title}
+
+Decisions live in analysts' heads — undocumented, unverifiable. Expertise walks out the door when people leave.
+:::
+
+::: {.problem-card .p-red .fragment}
+[⚠️ Inconsistency]{.problem-title}
+
+No cross-check mechanism across countries or series. Two analysts may reach different decisions for the same variable.
+:::
+
+::: {.problem-card .p-blue .fragment}
+[🔧 Fragile Scripts]{.problem-title}
+
+Legacy do-files carry implicit decisions never written down. The reasoning behind them is lost.
+:::
+
+::: {.problem-card .p-purple .fragment}
+[📈 Scaling Pressure]{.problem-title}
+
+Growing survey volume, fixed team capacity — purely manual harmonization has a hard ceiling.
+:::
+
+::::
+
+::: {.fragment}
+> **This project** addresses all these problems at once — without removing human authority over any decision.
+:::
+
+
+::: {.notes}
+The four pain points aren't just inconveniences — they're structural fragilities. Tacit knowledge: if a key analyst leaves, institutional expertise walks out the door. Inconsistency: two analysts working independently on similar variables in different countries may reach different decisions with no mechanism to catch that. Fragile scripts: Stata do-files written years ago contain implicit decisions that were never documented. Scaling: with budget pressure and growing survey volumes, the purely manual approach has a real ceiling.
+:::
+
+
+## The Core Idea {#slide-core-idea}
+
+:::{.center}
+
+```{mermaid}
+%%| fig-width: 20
+%%| fig-height: 7
+flowchart LR
+  classDef auto   fill:#1a3a5c,stroke:#4a90d9,color:#e6edf3,rx:10
+  classDef ai     fill:#2d1a4e,stroke:#9b59b6,color:#e6edf3,rx:12
+  classDef human  fill:#3d2800,stroke:#e6a817,color:#e6edf3,rx:20
+  classDef engine fill:#0d3320,stroke:#27ae60,color:#e6edf3,rx:12
+
+  P["📋 Structured Inputs<br/>data profile + documentation schema<br/>rules + precedents"]
+  A["🤖  AI Drafting<br/>RAG + LLM<br/>sandbox self-checks"]
+  B["👤  Human Review<br/>Approves, rejects,<br/>or annotates"]
+  C["⚙️  Deterministic Pipeline<br/>Execution → QA → outputs<br/>no AI judgment"]
+
+  P -->|" context "| A
+  A -->|" draft spec "| B
+  B -->|" approved spec "| C
+  C -.->|" save-back "| P
+
+  class P auto
+  class A ai
+  class B human
+  class C engine
+```
+
+:::
+
+[**Structured inputs**]{.stage-auto} = raw data and documentation converted to schemas
+
+[**AI**]{.stage-ai} = Drafting + Recall + Self-checks
+
+[**Human**]{.stage-human} = Authority + Judgment
+
+[**Execution + QA**]{.stage-engine} = Consistency + Reproducibility
+
+> **The AI never makes a final call. Nothing reaches production without explicit human sign-off.**
+
+. . .
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ What This System Is NOT](#slide-not-system)
+:::
+
+::: {.notes}
+This is the single most important slide in the deck. If we remember one thing, it should be this flow: raw materials first become structured schemas; the AI drafts from schemas, rules, and precedents; the human expert reviews and approves; deterministic code executes and QA checks the result. The AI's draft never runs directly — ever.
+:::
+
+
+## What This System Is NOT {#slide-not-system}
+
+:::: {.not-system-grid}
+
+::: {.not-system-card .fragment}
+[🚫 Not 100% automated]{.not-system-card-title}
+
+Human approval is required for every variable-level decision. The AI proposes — **we** decide.
+:::
+
+::: {.not-system-card .fragment}
+[🚫 Not a black box]{.not-system-card-title}
+
+Every decision the AI proposes is explained, traced, and overridable. Full audit trail.
+:::
+
+::: {.not-system-card .fragment}
+[🚫 Not a replacement for expertise]{.not-system-card-title}
+
+Analysts remain the methodological authority. Hard cases still require genuine judgment.
+:::
+
+::: {.not-system-card .fragment}
+[🚫 Not handling welfare aggregates (yet)]{.not-system-card-title}
+
+Phase 1 covers only non-welfare variables. Welfare is out of scope until the PoC succeeds.
+:::
+
+::::
+
+. . .
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Why Not Just Use a Chatbot?](#slide-chatbot)
+:::
+
+::: {.notes}
+Before going further, The AI is an assistant that does preparatory reading work. It is not a replacement for the analyst's judgment, and it cannot approve its own proposals.
+:::
+
+
+## Why Not Just Use a Chatbot? {#slide-chatbot}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### 💬 General chatbot (ChatGPT, etc.)
+
+- ❌ **Non-deterministic** — Same question → different answers
+- ❌ **Non-accountable** — No versioning, no attribution
+- ❌ **Unaware of our rules** — Doesn't know GMD methodology (Not enough context)
+- ❌ **No institutional memory** — Every session starts from scratch (No memory)
+- ❌ **No agentic behavior** — Cannot act autonomously
+
+:::
+
+::: {.column width="50%"}
+
+### ⚙️ Our system
+
+- ✅ **Deterministic execution** — Same inputs → same output, always
+- ✅ **Full audit trail** — Every decision versioned and attributed
+- ✅ **Rule-governed** — Schema DB enforces GMD methodology
+- ✅ **Institutional memory** — Historical decisions DB stores approved precedents
+- ✅ **Agentic behavior** — Can act autonomously within defined rules
+
+:::
+
+::::
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ The Full Pipeline](#slide-full-pipeline)
+:::
+
+::: {.notes}
+This question comes up naturally. We have access to ChatGPT and Claude — why build a dedicated system? The answer is that general-purpose chatbots are not suitable for producing official statistics. They're non-deterministic — the same question asked twice may get different answers. They're not accountable — no versioning, no audit trail, no human attribution. They don't know our rules — GMD methodology, the canonical schema, our past decisions — unless we configure them every time. And they have no institutional memory — every chat session starts from scratch. Our system solves all four problems: deterministic at execution, fully accountable, rule-governed, and connected to 15+ years of our team's decisions.
+:::
+
+
+# The Full Pipeline {background-color="#0f1f3d"}
+
+## The Full Pipeline {#slide-full-pipeline background-color="#0d1117"}
+
+![](../../img/full_pipeline_v1.png)
+
+[📦 Sources]{.badge-blue} · [⚡ Automated schemas]{.badge-blue} · [🤖 AI-assisted drafting]{.badge-purple} · [👤 Human checkpoint]{.badge-gold} · [⚙️ Deterministic execution]{.badge-green}
+
+::: {.appendix-jump}
+Need more detail? Jump to the appendix: [Storage components](#appendix-storage) · [RAG and retrieval](#appendix-rag) · [Rules and atomic mapping](#appendix-architecture) · [Harmonization spec](#appendix-spec)
+:::
+
+
+::: {.notes}
+This diagram is the process from the narrative. Raw inputs are permanent sources, not a processing stage. The first actual stage is pre-processing, with two parallel tracks. Raw microdata becomes a data profile schema; documentation becomes a documentation schema, or synthetic DDI where no DDI exists. Only structured schemas, rules, and precedents reach the AI.
+:::
+
+
+## Stage 1.a — Pre-processing {#stage-1a}
+
+:::: {.columns}
+
+::: {.fragment .column width="50%"}
+
+### 🔍 Data profiling track
+
+Raw microdata becomes a **data profile schema**:
+
+- variable names and labels
+- storage types and summary stats
+- missingness and value ranges
+- categorical frequencies and labels
+
+*Raw microdata is profiled — not sent directly to the AI.*
+
+:::
+
+::: {.fragment .column width="50%"}
+
+### 🤖 Documentation parsing track
+
+Survey documents become a **documentation schema**:
+
+- question text and response codes
+- universes and skip patterns
+- questionnaire structure
+- DDI if available; **synthetic DDI** if not
+
+*This replaces the manual first-read-through with structured extraction.*
+
+:::
+
+::::
+
+. . . 
+
+::: {.appendix-jump}
+Go to: [Full Pipeline](#slide-full-pipeline) 
+:::
+
+
+::: {.notes}
+Stage one is pre-processing. It has two parallel tracks. The data profiling track reads the raw microdata and computes a structured summary. The documentation parsing track reads PDFs, codebooks, DDI files, Excel files, or other documentation and converts them into a documentation schema. The important rule is that downstream stages receive structured schemas, not raw unstructured files.
+:::
+
+
+## Stage 1.b — Historical Decisions → Approved Precedents {#stage-1b}
+
+Before AI drafting, legacy harmonization scripts are converted into searchable institutional memory.
+
+**Historical decisions provide precedent — not rules.**
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### What we start with
+
+- Stata harmonization scripts
+- recodes and transformations
+- implicit analyst decisions
+- survey-specific logic
+
+:::
+
+::: {.column width="50%"}
+
+### What the system stores
+
+- structured decision records
+- reviewer-validated explanations
+- approved precedents
+- searchable RAG context
+
+:::
+
+::::
+
+::: {.callout-note}
+The [GMD schema]{.stage-auto} contains the **rules**. The [historical decisions database]{.stage-ai} contains **precedents** — validated examples of what experts did in similar situations. Historical decisions are **not copied blindly**. They are processed, interpreted, and validated before becoming approved precedents in the RAG system.
+:::
+
+::: {.notes}
+There is one more input before AI drafting: historical decisions. These mostly exist today inside harmonization scripts. The system processes those scripts, extracts the decisions they encode, adds a plain-language interpretation, and stores only validated decisions as approved precedents. The RAG system then retrieves these precedents when the AI drafts a new Harmonization Specification.
+:::
+
+. . .
+
+::: {.appendix-jump}
+Go to: [Full Pipeline](#slide-full-pipeline) . [Why Precedents Help](#why-precedents)
+:::
+
+
+## Stage 2 — AI Drafting {#stage-2}
+
+### The AI receives four inputs
+
+1. **Data profile schema** — what the raw data actually contains
+2. **Documentation schema** — what the survey documentation says variables mean
+3. **Historical decisions** — approved precedents extracted from harmonization scripts and retrieved through RAG
+4. **GMD [canonical]{.stage-auto} schema** — authoritative definitions, valid values, and derivation rules
+
+### It produces one artifact
+
+> A draft **Harmonization Specification**: one structured mapping proposal per variable, with reasoning, validation checks, cited precedents, confidence scores, and proposed transformations in code.
+
+::: {.notes}
+This is where the AI does its work, but it does not improvise from raw files. It receives two schemas, the GMD rulebook, and relevant historical decisions. It uses RAG to retrieve precedents, the LLM to draft a proposal, and an internal sandbox loop to check and revise obvious inconsistencies before we see it.
+:::
+
+
+::: {.appendix-jump}
+Go to: [Harmonization Specification example](#appendix-spec) . [Storage components](#appendix-storage) · [RAG and retrieval](#appendix-rag) 
+:::
+
+
+
+## Stage 3 — Human Review ★ {#stage-3}
+
+*The most important checkpoint in the entire pipeline*
+
+The reviewer:
+
+::: {.incremental}
+- **Receives** the Harmonization Specification (via an app).
+
+- **Inspects** the source variable, documentation, proposed GMD target, AI reasoning, and cited precedents.
+
+- **Can:**
+
+  - ✅ Approve the proposal as-is
+  - ✏️ Annotate or modify fields before approval
+  - ❌ Reject it and send structured feedback back to AI Drafting
+
+:::
+
+> Nothing moves to execution until a human expert approves the specification.
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [Harmonization Specification](#appendix-spec) 
+:::
+
+::: {.notes}
+This is where we come in. The Harmonization Specification is a proposal until we approve it. The review application presents the source variable, documentation, proposed mapping, AI reasoning, and precedents. Rejection is not discarded — it becomes structured feedback to the AI drafting stage. Approval triggers deterministic execution.
+:::
+
+
+## Stages ④ & ⑤ — Execute · Validate {#stage-45}
+
+:::: {.columns}
+
+::: {.fragment .column width="50%"}
+::: {.step-card .step-green}
+[④]{.step-num}
+
+### Execution
+
+A fixed [R or Python]{.stage-engine} engine reads the **approved** specification and applies it exactly.
+
+- No AI involved — pure deterministic logic
+- Same approved spec always produces the same output
+- Harmonization script written and executed in one step
+
+> *The AI never touches this stage.*
+:::
+:::
+
+::: {.fragment .column width="50%"}
+::: {.step-card .step-blue}
+[⑤]{.step-num}
+
+### Quality Assurance (ala `qcheck`)
+
+Automated checks compare the harmonized output against the [GMD schema]{.stage-auto}.
+
+- Valid ranges and data types
+- Completeness and missingness thresholds
+- Cross-variable consistency rules
+- **Pass** → move to outputs · **Fail** → trigger review loop
+:::
+:::
+
+::::
+
+. . .
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Review Loop · Save Back](#stage-67)
+:::
+
+::: {.notes}
+Once the spec is approved, execution is entirely mechanical. The engine applies the specification exactly — no AI, no randomness. QA then runs a battery of automated checks against the schema. Pass and fail are both explicit: there is no silent acceptance of bad output.
+:::
+
+
+## Stages ⑥ & ⑦ — Review Loop · Save Back {#stage-67}
+
+:::: {.columns}
+
+::: {.fragment .column width="50%"}
+::: {.step-card .step-gold}
+[⑥]{.step-num}
+
+### Review Loop
+
+When QA fails, the issue is routed by type:
+
+- **Technical** — AI agent diagnoses and revises, then re-executes at ④ without human input
+- **Methodological** — escalates back to human review at ③
+
+> *Nothing is silently discarded. Every failure has an owner.*
+:::
+:::
+
+::: {.fragment .column width="50%"}
+::: {.step-card .step-purple}
+[⑦]{.step-num}
+
+### Outputs + Learning Loop
+
+When QA passes, two things happen:
+
+- **GMD microdata** and an immutable **audit trail** are stored
+- The approved decision is written back as a new **precedent** in the [historical decisions DB]{.stage-ai}
+
+This is how institutional memory compounds — every harmonized survey makes the next one faster and more consistent.
+:::
+:::
+
+::::
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Appendix menu](#appendix-menu)
+:::
+
+::: {.notes}
+The review loop means QA failures are not silent — they are routed by type. Technical failures go to an AI agent that can fix and re-execute without human input. Methodological failures require a human decision. When QA passes, the output and audit trail are stored and the decision becomes a new precedent. That save-back loop is how the system gets better over time.
+:::
+
+
+## Team Impact, PoC Scope, and Phases {#poc}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### What changes for the team
+
+- Less time on first drafts
+- More systematic recording of decisions
+- Better consistency flagging across surveys
+- Searchable institutional memory from legacy work
+
+### What does not change
+
+- Human methodological authority
+- Human judgment on hard cases
+- The GMD methodology itself
+- Accountability for final approvals
+
+:::
+
+. . . 
+
+::: {.column width="50%"}
+
+### PoC scope and phases
+
+- **Phase 1 — Foundation**: define the spec, schema, and infrastructure.
+- **Phase 2 — Proof of Concept**: demographic variables only; measure time savings and review quality.
+- **Phase 3 — Production**: scale modules, legacy ingestion, and broader coverage later.
+
+**Out of scope in Phase 1:** welfare aggregates such as income and consumption.
+
+:::
+
+::::
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) 
+:::
+
+
+# Appendix {background-color="#0f1f3d"}
+
+
+## Appendix — Optional Deep Dives {#appendix-menu background-color="#0d1117"}
+
+Use these links when you want to answer follow-up questions without leaving the deck.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- [Storage components and databases](#appendix-storage)
+- [LLM, RAG, and the agent loop](#appendix-rag)
+- [Rules, precedents, and atomic mapping](#appendix-architecture)
+
+:::
+
+::: {.column width="50%"}
+
+- [The harmonization specification](#appendix-spec)
+- [Team impact, PoC scope, and phases](#appendix-poc)
+
+:::
+
+::::
+
+
+## Storage Components — What Each One Stores {#appendix-storage}
+
+| Component | What it stores | Best query style | Why it exists |
+|---|---|---|---|
+| **File storage** | raw microdata, PDFs, DDI, outputs, audit artifacts | file/path retrieval | durable storage for large source and output files |
+| **GMD schema DB** | canonical variable definitions, valid values, derivation rules | **standard SQL / exact structured queries** | authoritative rulebook |
+| **Historical decisions DB** | approved precedents, reviewer explanations, searchable context | **RAG retrieval / semantic + keyword search** | institutional memory for similar past cases |
+| **Spec + metadata store** | harmonization specs, statuses, review metadata, workflow state | structured application queries | operational control of the review pipeline |
+
+::: {.callout-note}
+The key distinction is this: the [GMD schema DB]{.stage-auto} is a structured relational system optimized for exact rules and constraints. The [historical decisions DB]{.stage-ai} is optimized for retrieval — finding the **most relevant prior cases**, not enforcing methodology. SQL answers “what is the rule?” RAG answers “what similar validated cases exist?”
+:::
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Appendix menu](#appendix-menu)
+:::
+
+
+## LLM, RAG, and the Agent Loop {#appendix-rag}
+
+:::: {.columns}
+
+::: {.column width="34%"}
+
+### LLM
+
+Reads documentation, reasons over structured inputs, and drafts the harmonization proposal.
+
+:::
+
+::: {.column width="33%"}
+
+### RAG
+
+Retrieves only the most relevant rules and past approved decisions at query time.
+
+:::
+
+::: {.column width="33%"}
+
+### Agent loop
+
+Runs build–test–repair checks in a sandbox before the proposal reaches the human reviewer.
+
+:::
+
+::::
+
+::: {.callout-note}
+Without RAG, the LLM would not reliably use GMD methodology or past decisions. Without the agent loop, more obvious technical problems would reach human review.
+:::
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Appendix menu](#appendix-menu)
+:::
+
+
+## Rules, Precedents, and Atomic Mapping {#appendix-architecture}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### Rules vs. precedents
+
+- **Rules** live in the canonical schema database.
+- **Precedents** live in the historical decisions database.
+- Rules always override precedents.
+- Precedents accelerate judgment; they do not replace it.
+
+:::
+
+::: {.column width="50%"}
+
+### Atomic mapping principle
+
+- The AI maps to the most granular atomic variable.
+- Derived variables are produced later by deterministic code.
+- This improves transparency, consistency, and auditability.
+
+:::
+
+::::
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Appendix menu](#appendix-menu)
+:::
+
+
+## Why Precedents Help — and Don't Confuse the System {#why-precedents}
+
+:::: {.columns}
+
+::: {.fragment .column width="54%"}
+
+### Why past decisions matter
+
+1. **Same-survey continuity** — ENIGH 2018 helps ENIGH 2020, so review becomes “confirm what changed” rather than “start from zero.”
+2. **Country and region patterns** — Nigerian and West African precedents give the AI a better prior for similar survey structures.
+3. **Edge cases** — past decisions show what the team actually did when guidelines alone are not specific enough.
+4. **Consistency enforcement** — similar ambiguities are nudged toward being resolved the same way across surveys and analysts.
+
+:::
+
+::: {.fragment .column width="46%"}
+
+### Why the system does not get confused
+
+- **Retrieval specificity** — it retrieves only relevant precedents: same country first, then region, instrument type, and variable.
+- **Rules override precedents** — if precedent conflicts with the canonical schema, the [schema]{.stage-auto} wins and the conflict is flagged.
+- **Human review is final** — the AI cites the exact precedents it used, and the reviewer can validate or override.
+- **Overrides improve memory** — every correction is stored too, so the system learns not just mappings, but documented fixes.
+
+:::
+
+::::
+
+::: {.notes}
+This is where the distinction becomes important. Past decisions are not rules; they are precedents. Their value comes from four places. First, same-survey continuity: if we already harmonized an earlier wave of the same survey, the AI can retrieve those decisions and propose likely mappings with high confidence. Second, country and regional patterns: precedents help the AI recognize recurring structures common in particular regions or survey families. Third, edge cases: where the guidelines cannot specify every unusual survey design, past validated decisions show what the team actually did. Fourth, consistency: precedents reduce the chance that the same ambiguity gets resolved differently by different analysts or different AI calls. The system avoids confusion because retrieval is selective, the schema always overrides precedent, the human reviewer sees and can reject the cited precedent, and every override is stored as a new correction for future use.
+:::
+
+::: {.appendix-nav}
+[← Back to the Historical Decisions](#stage-1b) · [↑ Appendix menu](#appendix-menu)
+:::
+
+## How does the [Harmonization Specification]{.orange} look? {#appendix-spec .scrollable .gmd-spec-slide}
+
+```{r}
+#| echo: false
+#| results: asis
+#| code-fold: true
+embed_gmd_spec()
+```
+
+::: {.appendix-nav}
+[← Back to the full pipeline](#slide-full-pipeline) · [↑ Stage 2](#stage-2)
+:::
+

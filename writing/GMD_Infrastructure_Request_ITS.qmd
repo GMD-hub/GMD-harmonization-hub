@@ -1,0 +1,257 @@
+---
+title: "GMD AI-Assisted Harmonization System"
+subtitle: "Infrastructure Request for ITS Review"
+author: "GPID Team"
+date: "May 2026"
+date-format: "MMMM YYYY"
+
+format:
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    documentclass: article
+    geometry:
+      - top=1in
+      - bottom=1in
+      - left=1in
+      - right=1in
+    fontsize: 11pt
+    colorlinks: true
+    linkcolor: wbnavy
+    urlcolor: wbblue
+    include-in-header:
+      text: |
+        \usepackage{fancyhdr}
+        \pagestyle{fancy}
+        \fancyhf{}
+        \fancyhead[L]{\small GMD AI-Assisted Harmonization -- Infrastructure Request}
+        \fancyhead[R]{\small DRAFT v2.0 | World Bank Group}
+        \fancyfoot[C]{\thepage}
+        \usepackage{xcolor}
+        \definecolor{wbnavy}{HTML}{003366}
+        \definecolor{wbblue}{HTML}{0071BC}
+  docx:
+    toc: false
+    number-sections: true
+    highlight-style: github
+    reference-doc: ../assets/reference.docx
+execute:
+  echo: false
+  warning: false
+
+---
+
+```{=latex}
+\newpage
+```
+
+::: {.callout-note appearance="minimal"}
+**PURPOSE**
+
+This note summarizes the infrastructure required for a proof of concept of the GMD AI-assisted harmonization pipeline. It is intended to support ITS review and to obtain clear guidance on which services, access patterns, and security controls are available in the WBG Azure environment.
+:::
+
+# Summary
+
+The GPID team is developing an AI-assisted workflow to support harmonization of household surveys into the Global Monitoring Database.
+
+The operating model is straightforward:
+
+- The system reads survey documentation and drafts a structured Harmonization Specification.
+- A GPID team expert reviews and approves the specification.
+- A deterministic execution engine runs only approved specifications.
+
+This means AI supports drafting, while final methodological decisions and production execution remain under human control.
+
+# What We Need from ITS
+
+We are asking ITS to confirm the availability and configuration of the infrastructure required to operate this workflow in a policy-compliant Azure environment. In particular, we need guidance on:
+
+- approved storage for restricted survey data and documentation;
+- approved database services;
+- approved access to enterprise AI services;
+- approved services for similarity-based retrieval of historical decisions;
+- an approved compute environment for a team-managed Python pipeline; and
+- standard logging and monitoring services, with direct read access for the GPID team; and
+- an approved hosting and notification model for the human review interface.
+
+# Division of Responsibilities
+
+| ITS Responsibilities | GPID Team Responsibilities |
+|---|---|
+| Provision and secure the infrastructure | Develop and maintain the pipeline code |
+| Approve the relevant Azure services and access model | Design prompts, rules, and harmonization logic |
+| Ensure compliance with WBG security and data policies | Review and approve all AI-generated specifications |
+| Maintain the underlying platform services | Operate the harmonization workflow within the approved environment |
+
+: Division of Responsibilities {tbl-colwidths="[50,50]"}
+
+The GPID team will need direct access to deploy code, monitor jobs, and review logs within the approved environment. The workflow is not practical if each deployment or troubleshooting step requires a separate ITS ticket.
+
+# Required Infrastructure Components
+
+## Storage
+
+We need secure cloud storage for survey microdata, documentation, legacy harmonization scripts, and pipeline outputs. This storage must support controlled access by the pipeline and preserve original files for audit and reproducibility.
+
+We expect Azure Blob Storage to be the most likely fit, subject to ITS guidance on approved configurations for restricted data.
+
+Where available, we intend to ingest DDI metadata from the World Bank Microdata Library API at <https://microdata.worldbank.org>. This requires outbound access from the compute environment to that service.
+
+::: {.callout-tip appearance="simple"}
+**ITS QUESTION 1**
+
+Is there an approved Azure Blob Storage environment where we can store restricted household survey microdata? If so, what access controls and data classification requirements apply?
+
+**ITS QUESTION 2**
+
+Can our compute environment make outbound API calls to `microdata.worldbank.org` to retrieve DDI metadata files?
+:::
+
+## Relational Database
+
+We need a relational database to store the canonical definitions of GMD variables, validation rules, dependencies, and other structured metadata used by the pipeline.
+
+This database is the authoritative source for variable definitions. Historical precedents may inform a recommendation, but they must not override the canonical schema.
+
+Azure SQL Database or PostgreSQL on Azure would both satisfy the requirement. We defer to ITS on the approved service in our environment.
+
+::: {.callout-tip appearance="simple"}
+**ITS QUESTION 3**
+
+What is the standard approved relational database service in the WBG Azure environment: Azure SQL, PostgreSQL, or another option? Is there an existing instance we could use, or would a new one need to be provisioned?
+:::
+
+## Enterprise AI Service
+
+We need an enterprise-approved large language model service to draft Harmonization Specifications from survey documentation and reference materials.
+
+Our preferred option is Azure OpenAI Service, subject to WBG approval and data classification rules. This is the key dependency for the AI design.
+
+The AI will primarily process survey documentation and metadata rather than respondent-level microdata, but we need ITS guidance on what data categories are permitted.
+
+If Azure OpenAI is not approved, we need the approved alternative for running large language models within the WBG environment.
+
+::: {.callout-important appearance="simple"}
+**ITS QUESTION 4 -- PRIORITY**
+
+Is Azure OpenAI Service approved for use in the WBG Azure tenant? If yes, what data classification levels are permitted, and are there restrictions on what data may be sent to it? If no, what is the approved path for using large language models within the WBG environment?
+:::
+
+## Historical Decisions Retrieval
+
+We need a searchable store of past harmonization decisions so the system can retrieve relevant precedents when drafting new specifications.
+
+This is distinct from the rules database. The rules database is authoritative. The historical store is advisory and is intended to improve consistency and reuse institutional knowledge.
+
+The retrieval requirement is similarity-based rather than exact-match only, so we expect a vector-capable search service to be required.
+
+Azure AI Search with vector search appears to be the most likely fit, subject to ITS guidance.
+
+::: {.callout-tip appearance="simple"}
+**ITS QUESTION 5**
+
+Is Azure AI Search available and approved in our environment with vector search capabilities enabled? If not, is there an alternative approved service for similarity-based document retrieval?
+:::
+
+## Compute Environment
+
+We need an approved compute environment to run a Python-based pipeline that connects to storage, databases, the AI service, and the historical retrieval service.
+
+Our target production architecture is Azure Kubernetes Service (AKS). For the proof of concept, we are open to a simpler approved option if that accelerates setup, provided it does not block later migration to AKS.
+
+For the GPID team to operate effectively, the environment must allow:
+
+- self-service code deployment;
+- direct read access to job and application logs; and
+- a separate non-production environment for development and testing.
+
+::: {.callout-tip appearance="simple"}
+**ITS QUESTION 6**
+
+Is Azure Kubernetes Service (AKS) available for a team-managed workload, and can our team have self-service deployment and log access?
+
+**ITS QUESTION 7**
+
+If AKS is not immediately available, what is the simplest approved compute environment for running scheduled Python-based jobs? Can ITS confirm that AKS remains the path for production?
+:::
+
+## Logging, Monitoring, and Audit
+
+We need standard platform logging and monitoring for pipeline jobs, together with a structured audit trail of inputs, approvals, execution versions, outputs, and validation results.
+
+We expect detailed logs to flow to the standard Azure monitoring service used by ITS, while structured run records can be stored in the relational database.
+
+::: {.callout-tip appearance="simple"}
+**ITS QUESTION 8**
+
+What is the standard logging and monitoring service in our Azure environment? Can our jobs be onboarded to it? What is the retention policy? Can our team query logs directly without routing requests through ITS?
+:::
+
+## Human Review Interface
+
+We need a simple application layer where a GPID reviewer can inspect the AI-drafted Harmonization Specification, approve or reject proposed mappings, add comments, and submit the reviewed specification back into the workflow.
+
+This is a separate component from the pipeline itself. The integration point should remain simple: the pipeline writes a draft specification to shared storage, the review interface reads it, the reviewer submits decisions, and the reviewed specification is written back to shared storage for downstream execution.
+
+At this stage, we need ITS guidance on the approved hosting model. Two practical options appear plausible:
+
+- a Posit Connect hosted application, likely implemented in Shiny. In this case, the GPID team expects to be able to build and maintain the application itself; or
+- a lightweight Python web application hosted directly in Azure. In this case, the GPID team may try to build the application as well, but we may also require ITS support depending on the approved hosting and deployment model.
+
+We also need an approved notification mechanism so reviewers can be alerted when a new draft specification is ready for review.
+
+::: {.callout-tip appearance="simple"}
+**ITS QUESTION 9**
+
+Is Posit Connect available and approved in our environment? If so, can applications hosted on Posit Connect be granted credentials to read from and write to Azure Blob Storage, with the GPID team building and maintaining the application? Alternatively, is there an approved path for hosting a lightweight Python web application directly within the Azure environment, and if so, what level of ITS support would be required for that option?
+
+
+**ITS QUESTION 10**
+
+What is the approved mechanism for sending automated notifications, such as email or Teams messages, triggered by file activity in Azure Blob Storage, for example when a new draft specification is ready for review?
+:::
+
+# Access Model Required for the PoC
+
+For the proof of concept to be workable, the GPID team needs:
+
+- the ability to deploy updated code without filing an ITS request for each change;
+- direct visibility into pipeline logs for debugging and operational review; and
+- a development environment separated from any production or restricted-data environment.
+
+This access model is a requirement for the PoC, not a later enhancement.
+
+# Scope of the Proof of Concept
+
+The proof of concept covers non-welfare demographic variables only, including sex, age, education, urban or rural classification, household relationships, and labor force status. Welfare aggregates, including income and consumption, are out of scope.
+
+Expected annual throughput is approximately 100 to 200 new surveys. The PoC will begin with a smaller representative subset.
+
+# Consolidated Questions for ITS
+
+| # | Topic | Question |
+|---|---|---|
+| Q1 | Storage | Is there an approved Azure Blob Storage environment for restricted household survey microdata? What access controls and data classification requirements apply? |
+| Q2 | Storage / API | Can our compute environment make outbound API calls to `microdata.worldbank.org` to retrieve DDI metadata files? |
+| Q3 | Relational database | What is the standard approved relational database service in the WBG Azure environment, and is an existing instance available? |
+| **Q4** | **AI service** | **Is Azure OpenAI Service approved in the WBG Azure tenant? If yes, what data classification levels are permitted? If no, what is the approved alternative for using large language models?** |
+| Q5 | Historical retrieval | Is Azure AI Search available and approved with vector search capabilities? If not, what approved alternative is available? |
+| Q6 | Compute | Is AKS available for a team-managed workload, and can our team have self-service deployment and log access? |
+| Q7 | Compute / PoC path | If AKS is not immediately available, what simpler approved compute environment should be used for the PoC, and can ITS confirm AKS remains the production path? |
+| Q8 | Monitoring | What is the standard logging and monitoring service, what is the retention policy, and can our team query logs directly? |
+| Q9 | Review interface / hosting | Is Posit Connect available and approved, with Blob Storage access for an application built by the GPID team? Alternatively, is there an approved path for hosting a lightweight Python web application directly in Azure, and what level of ITS support would that require? |
+| Q10 | Review interface / notifications | What is the approved mechanism for sending automated email or Teams notifications triggered by file activity in Azure Blob Storage? |
+
+: Consolidated ITS Questions {tbl-colwidths="[7,18,75]"}
+
+# What We Are Not Asking ITS to Build
+
+We are not asking ITS to design the harmonization methodology, develop the AI workflow, write prompts, or implement the pipeline logic.
+
+We are asking ITS to confirm and provision the infrastructure, security model, and access pattern required for the GPID team to build and operate the solution within the approved environment.
+
+---
+
+*GPID Team · Development Data Group · World Bank Group · May 2026 · DRAFT v2.0*

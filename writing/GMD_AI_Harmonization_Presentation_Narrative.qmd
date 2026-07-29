@@ -1,0 +1,340 @@
+---
+title: "AI-Assisted Harmonization of the Global Monitoring Database"
+subtitle: "A Plain-Language Introduction for the GMD Team"
+author: "GMD Harmonization Team"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    theme: cosmo
+  revealjs:
+    theme: simple
+    css: assets/css/tachyons.min.css
+    slide-number: true
+    toc: false
+  docx:
+    toc: true
+    number-sections: true
+    highlight-style: github
+---
+
+# Why We Are Doing This
+
+## The Current Situation
+
+Every year, our team harmonizes between 100 and 200 household surveys from countries across the world into the Global Monitoring Database (GMD). For each survey, a skilled analyst reads the raw documentation, figures out how country-specific variables map to GMD's canonical format, writes a Stata script to perform the transformation, and validates the result. This process works. It has produced high-quality, internationally comparable data that underpins the World Bank's official poverty statistics.
+
+But it is also slow, labor-intensive, and fragile in ways that are increasingly difficult to sustain:
+
+- **It depends on individual expertise.** A significant share of the institutional knowledge about *why* past decisions were made lives in analysts' heads or in undocumented scripts, not in any system anyone can consult.
+
+- **Consistency is hard to guarantee.** When two analysts independently harmonize a similar variable — say, education levels in two Sub-Saharan African countries — they may reach different decisions without realizing it. Nothing in the current process systematically flags these divergences.
+
+- **Legacy scripts are fragile.** Stata do-files written years ago are difficult to audit, update, or hand off to new team members. Many contain implicit decisions that were never written down.
+
+- **Scaling is a challenge.** As the GMD grows and survey volumes increase, the current manual approach faces real constraints — especially given budget pressures and staffing limitations.
+
+This project is a response to all four of these problems at once.
+
+---
+
+# What We Are Building
+
+## The Core Idea in One Sentence
+
+We are building a system where **an AI drafts the harmonization decisions, a human expert reviews and approves them, and a deterministic engine executes them** — so that nothing ever reaches production without explicit human sign-off.
+
+This is not a system that replaces the analyst. It is a system that does the repetitive preparatory work — reading documentation, recalling past cases, drafting a structured proposal — so the analyst can focus on what requires genuine expert judgment: reviewing, correcting, and approving.
+
+Think of it as having a very well-read assistant who has studied every past harmonization the team has ever done, can recall them instantly, and drafts a first proposal for every new survey. The analyst reads the draft, corrects what needs correcting, and approves it. The assistant never makes a final call.
+
+## What This System Is Not
+
+It is worth being explicit about what this system does *not* do:
+
+- It does **not** automate harmonization. Human approval is required for every variable-level decision.
+- It does **not** replace domain expertise. Analysts remain the methodological authority.
+- It does **not** handle welfare aggregates — consumption, income — in the first phase. Those are out of scope until the proof of concept succeeds on demographic variables.
+- It is **not** a black box. Every decision the AI proposes is explained, traceable, and overridable.
+
+---
+
+# Key Concepts: A Glossary for the GMD Team
+
+Before describing how the system works, it helps to define a few terms that will come up repeatedly. These are not buzzwords — each one describes a specific component of the system with a specific job.
+
+## Large Language Model (LLM)
+
+A **Large Language Model**, or LLM, is the type of AI that powers tools like ChatGPT or Claude. It is a system trained on vast amounts of text that can read documents, answer questions, follow instructions, and generate structured output. In our system, the LLM is used to read survey documentation and draft a harmonization proposal — not to make methodological decisions, but to do the interpretive reading work that currently takes analysts significant time.
+
+An important distinction: an LLM used as a standalone chatbot is a general-purpose tool. In our system, the LLM is embedded in a structured pipeline with strict guardrails. It is told exactly what format to produce, what rules to follow, and what it is not allowed to decide on its own.
+
+## Relational Database
+
+A **relational database** is a structured, table-based store of information — similar in spirit to a well-organized spreadsheet, but far more powerful and queryable. You have almost certainly used one indirectly: the GMD canonical variable list, for instance, can be thought of as a relational table.
+
+In our system, the relational database stores the **canonical GMD schema**: the authoritative definitions of every GMD variable — its name, valid value range, data type, mandatory/optional status, known edge cases, and validation rules. Think of it as the rulebook. When the system needs to know the official definition of `educat4`, it looks here.
+
+## Vector Database
+
+A **vector database** is a more specialized concept, and one worth understanding carefully because it is central to how our system learns from the past.
+
+When a computer stores a piece of text in a regular database, it stores the words themselves. Searching means looking for exact word matches. A vector database works differently: it converts text into a list of numbers (called a **vector** or **embedding**) that captures the *meaning* of the text, not just the words. When you query a vector database, it finds records that are *semantically similar* — conceptually close — even if they use different words.
+
+**Why does this matter for us?** When the AI is processing a new survey from, say, Tanzania, and encounters an education variable with unusual categories, we want it to recall past decisions from similar surveys — not just surveys that used the exact same variable name. A vector database makes that kind of intelligent recall possible. It can retrieve: *"Here are five past cases where we faced a similar education classification challenge, and here is what the analyst decided and why."*
+
+In our system, the vector database stores the full history of approved harmonization decisions — one record per variable per survey. This is the system's institutional memory.
+
+## Retrieval-Augmented Generation (RAG)
+
+**Retrieval-Augmented Generation**, universally abbreviated as **RAG**, is the technique that connects the LLM to the vector database.
+
+Here is the problem RAG solves: an LLM, by itself, only knows what it was trained on. It cannot look up your past decisions or consult the GMD rulebook unless you give it that information. RAG is the mechanism for doing so: before the LLM drafts a harmonization proposal, the system automatically retrieves the most relevant past decisions from the vector database and the relevant rules from the relational database, and hands all of that context to the LLM as background reading.
+
+In plain language: **RAG is what turns the LLM from a general-purpose AI into a GMD-aware assistant that has read every past decision your team has made.**
+
+## AI Agent and Agentic Behavior
+
+An **AI agent** is an LLM that can take actions in sequence — not just answer a single question, but perform a multi-step task, observe the result, and adjust what it does next.
+
+In our system, the agent behavior is specifically used in the **build–test–repair loop**: after the AI drafts a harmonization specification, it can attempt to run it in a safe, sandboxed environment (not production), check whether the output passes validation rules, and revise the specification if it does not — repeating this process up to a defined limit. This reduces the number of errors a human reviewer needs to catch, because the AI catches many of them itself first.
+
+This is an important distinction from a simple chatbot: a chatbot answers and stops. An agent can iterate. But in our system, the agent operates strictly within predefined rules and cannot approve its own work. A human always reviews and approves before anything enters production.
+
+## The Harmonization Specification
+
+The **Harmonization Specification** is the central document the system produces for each variable in each new survey. It is a structured record that declares:
+
+- Which GMD variable is being mapped to (e.g., `educat4`)
+- Which raw survey variable(s) it comes from
+- What transformation is applied (e.g., a value recode)
+- Which case applies: direct mapping, inferred mapping, or not mappable
+- If inferred: what rule was used and where it came from (schema DB or historical precedent)
+- If not mappable: what is missing and why
+- What validation checks should be run
+- The AI's confidence level and reasoning
+- Space for the human reviewer to override and record their justification
+
+The analyst reads this document, modifies it where needed, and approves it. **The approved Specification is what the harmonization engine executes.** It is never the AI's draft that runs — it is always the human-approved version.
+
+---
+
+# How the System Works: Step by Step
+
+## Overview
+
+The pipeline has seven stages. The first two happen automatically. Stage 3 involves the AI with optional iteration. Stage 4 is the critical human checkpoint. Stages 5–7 are deterministic: no AI, no judgment calls, just execution of what was approved.
+
+## Stage 1 — Inputs
+
+The system receives:
+
+- The raw survey microdata
+- The survey questionnaire and codebook (documentation)
+- Any prior harmonizations for this country and survey series
+
+All non-English materials are translated before processing. The system supports surveys in multiple languages.
+
+## Stage 2 — Survey Profiling
+
+The system automatically reads the survey documentation and produces a structured profile: what variables are present, what their labels are, how the questionnaire is organized. This is the equivalent of the first read-through an analyst currently does manually.
+
+## Stage 3 — AI-Assisted Interpretation and Mapping
+
+This is where the LLM and the RAG system do their work.
+
+For each target GMD variable in scope, the system:
+
+1. Retrieves the relevant rules from the **relational database** (the canonical schema)
+2. Retrieves semantically similar past decisions from the **vector database** (historical precedents)
+3. Hands all of this context to the LLM
+4. The LLM drafts a Harmonization Specification
+
+The AI agent may then enter the **build–test–repair loop**: it executes its draft specification in a sandboxed environment, checks whether the output passes GMD validation rules, and revises the specification if it does not. This continues until the output is valid or the iteration limit is reached.
+
+The result is a draft Harmonization Specification, ready for human review.
+
+## Stage 4 — Human Review and Approval
+
+This is the stage where **you** come in — and it is the most important stage in the entire pipeline.
+
+The analyst receives the draft Harmonization Specification. They read it, validate the proposed mapping, resolve any ambiguities the AI flagged, and make the final methodological decision. They can accept the proposal as-is, modify it, or reject it entirely and write their own.
+
+All decisions — including overrides and the justifications for them — are recorded. Every approved specification is time-stamped, versioned, and attributed to the reviewer.
+
+Nothing proceeds to execution without explicit approval at this stage.
+
+## Stage 5 — The Harmonization Engine (Deterministic Execution)
+
+The approved Harmonization Specification is handed to the **Harmonization Engine** — a fixed, versioned script written in R (or Python) that contains no AI whatsoever.
+
+The engine reads the raw survey data, applies the approved mappings and transformations exactly as specified, and produces the harmonized GMD microdata. Given the same inputs and the same approved specification, it will always produce exactly the same output. This is what "deterministic" means: no randomness, no judgment, no surprises.
+
+## Stage 6 — Quality Assurance and Validation
+
+Automated checks run against the output: schema compliance, key integrity, plausibility conditions, and cross-country consistency checks. Any warnings or failures are flagged for human review.
+
+## Stage 7 — Outputs and Audit Trail
+
+The final outputs are the harmonized GMD microdata and a complete, versioned audit trail: every decision made, by whom, when, based on what evidence, and with what justification. This is the permanent record that supports reproducibility, peer review, and institutional memory.
+
+Approved decisions are also written back into the **vector database** so that future surveys can benefit from them. This is the **save-back loop** — how the system improves over time.
+
+---
+
+# The Two-Database Architecture: Why Both Are Needed
+
+A question that often comes up: why two databases? Why not just one?
+
+The answer is that they serve fundamentally different purposes.
+
+The **relational database** (the schema database) stores *rules*. It answers the question: "What is the official GMD definition of this variable, and what are its valid values?" Rules are authoritative. When the schema says something, it is binding. No precedent can override a rule.
+
+The **vector database** (the historical decisions database) stores *precedents*. It answers the question: "What did our analysts decide when they faced a similar situation in the past, and why?" Precedents are advisory. They help the AI reason by analogy, but they are never binding. If a past decision conflicts with a current rule, the rule wins — always.
+
+This separation is intentional and important. It prevents the system from drifting: if a past decision was wrong, or if the GMD methodology has been updated since, the rule database corrects it. The system cannot learn its way into methodological error.
+
+---
+
+# The Atomic Mapping Principle
+
+One of the most important design rules of this system is worth explaining on its own: the AI **never maps directly to a derived or aggregate variable**. It maps only to the most granular atomic variables.
+
+**What does this mean in practice?**
+
+Take the education variables. GMD has several: `educy` (years of education completed), `educat4` (four-category classification), `educat5` (five-category), and `educat7` (seven-category). The AI maps only to `educy`. The categorical variables — `educat4`, `educat5`, `educat7` — are then derived deterministically from `educy` by a fixed script, not by the AI.
+
+This matters for three reasons:
+
+1. **Transparency.** You can always trace exactly how a categorical variable was derived. There is no AI judgment buried inside it.
+2. **Consistency.** Every survey uses the same derivation rules. There is no risk of the AI applying slightly different thresholds from one survey to the next.
+3. **Auditability.** If a methodology changes — say, the thresholds for `educat4` are revised — you update one rule in one place, and every survey benefits from the correction automatically.
+
+---
+
+# What Changes for Harmonizers — and What Does Not
+
+## What Changes
+
+- **You spend less time on first drafts.** The AI reads the documentation, recalls similar past cases, and proposes a mapping before you even open the codebook. You start from a draft, not a blank page.
+- **Your decisions are systematically recorded.** Every approval, override, and justification becomes part of the institutional record — automatically, in a structured format that future analysts can retrieve.
+- **Consistency checking is automated.** The system flags when a proposed mapping diverges from similar past decisions, prompting you to either confirm the divergence is intentional or catch an error.
+
+## What Does Not Change
+
+- **Your methodological authority.** Nothing runs without your sign-off. The AI proposes; you decide.
+- **Your judgment on hard cases.** The cases that require genuine expertise — unusual survey designs, conceptual ambiguities, country-specific context — still require exactly that.
+- **The GMD methodology itself.** This system implements and enforces the existing methodology. It does not change what GMD variables mean or how they are defined.
+
+---
+
+# What We Are Building First: The Proof of Concept
+
+## Scope
+
+We are not building the full system all at once. The initial **Proof of Concept (PoC)** is deliberately narrow: it covers only **non-welfare demographic variables**. Specifically:
+
+- Gender (`male`)
+- Age (`age`, `agecat`)
+- Education (`educy`, `educat4`, `educat5`, `educat7`, `school`, `literacy`, `primarycomp`)
+- Urban/rural classification (`urban`)
+- Household relationship (`relationharm`, `relationcs`)
+- Labor force status (`lstatus`) and related variables
+
+Welfare aggregates — consumption, income — are explicitly out of scope for the PoC and will be addressed in a later phase, once the approach has been validated on demographic variables.
+
+## Why Start Here
+
+Demographic variables are a good starting point because they are well-defined, methodologically stable, and representative of the different mapping challenges the system will face: some surveys will have direct equivalents (Situation A), some will require inference and conversion rules (Situation B), and some will genuinely lack the source information (Situation C). Working through these cases on demographic variables will test every component of the system before we extend it to more complex territory.
+
+## What Success Looks Like
+
+The PoC succeeds if:
+
+1. The AI can produce a complete, correctly structured Harmonization Specification for a demographic variable from a new survey.
+2. The specification is accurate enough that a human reviewer can validate or correct it in significantly less time than writing it from scratch.
+3. The approved specification executes correctly in the Harmonization Engine and passes all validation checks.
+4. The approved decision is stored back into the historical database in a structured, retrievable format.
+
+---
+
+# Seeding the System: Legacy Script Ingestion
+
+The vector database that powers our system's institutional memory starts empty. Before it can help harmonizers, it needs to be populated with past decisions. This is the job of the **legacy script ingestion pipeline**.
+
+The pipeline processes our existing Stata do-files in four steps:
+
+1. **Parse** — A tool called `do2screen` reads the Stata script and extracts the structural logic: which source variables are used, what transformations are applied, what conditionals are present.
+2. **Interpret** — The LLM reads the extracted code and produces a plain-English explanation of what the code does and, where it can infer it, why.
+3. **Validate** — A human reviewer reads the interpretation and confirms or corrects it before it enters the database. Low-quality or ambiguous extractions are not stored without review.
+4. **Store** — The validated record is written into the vector database as a structured historical decision.
+
+This pipeline serves two purposes: it populates the system with institutional memory from day one, and it surfaces the implicit knowledge currently buried in legacy scripts — making it explicit, searchable, and reusable.
+
+---
+
+# Infrastructure and Technology
+
+## Where This Will Run
+
+The system is planned to run in the **Microsoft Azure** cloud environment used by the World Bank Group. Azure provides all the services needed: database hosting, AI model access, compute, and security controls consistent with WBG data governance requirements.
+
+The most important pending infrastructure question is whether **Azure OpenAI Service** — Microsoft's enterprise-grade, compliant version of the GPT model family — is approved for use within the WBG tenant. This is currently being confirmed with ITS.
+
+## What the Team Does Not Need to Know
+
+Harmonizers do not need to interact with the infrastructure directly. The user-facing interface will be a review and approval workflow — essentially a structured form where the AI's draft Harmonization Specification is presented, edits can be made, and approval is recorded. The databases, the AI models, the execution engine — all of that is under the hood.
+
+---
+
+# Why Not Just Use a Chatbot?
+
+This question deserves a direct answer, because it comes up naturally: if we have access to tools like ChatGPT or Claude, why build a dedicated system?
+
+The answer is that general-purpose AI chatbots, however powerful, are not suitable for producing official statistics. They are:
+
+- **Non-deterministic.** The same question asked twice may produce a different answer. For reproducible statistical data, that is not acceptable.
+- **Non-accountable.** A chatbot answer cannot be traced, versioned, or attributed to a responsible human decision-maker.
+- **Unaware of your rules.** A chatbot does not know GMD methodology, your canonical schema, or your past decisions unless you tell it every time — and even then, you cannot be sure it applies them consistently.
+- **Not connected to your institutional memory.** Every chat session starts from scratch.
+
+Our system solves all four problems: it is deterministic at the execution stage, fully accountable through the audit trail, rule-governed through the schema database, and connected to institutional memory through the vector database and RAG.
+
+The AI in our system does what AI is genuinely good at — reading and interpreting unstructured documentation, recalling similar past cases, drafting structured proposals — while the parts that require consistency, reproducibility, and accountability are handled by deterministic code and human judgment.
+
+---
+
+# Summary: The System at a Glance
+
+| Component | What It Does | Technology |
+|---|---|---|
+| Relational Database | Stores GMD canonical schema and rules | SQL database (Azure) |
+| Vector Database | Stores historical harmonization decisions | Vector DB (Azure) |
+| RAG Layer | Retrieves relevant rules and precedents for each new survey | Retrieval-Augmented Generation |
+| LLM (AI model) | Reads documentation, drafts Harmonization Specifications | Azure OpenAI / LLM |
+| AI Agent loop | Tests and revises draft specs in a sandbox before human review | Agentic build–test–repair |
+| Harmonization Specification | The central artifact: AI drafts, human approves | Structured document |
+| Harmonization Engine | Executes approved specs deterministically | R or Python script |
+| Audit Trail | Records every decision, override, and justification | Versioned log |
+| Save-back Loop | Writes approved decisions back into the vector database | Automated pipeline |
+
+---
+
+# Next Steps
+
+The project is moving through three phases:
+
+**Phase 1 — Foundation** (current)
+Formalize the Harmonization Specification framework and canonical schema. Define the exact structure and required content of specifications. Confirm infrastructure with ITS.
+
+**Phase 2 — Proof of Concept**
+Build and validate the pipeline on a representative set of demographic variable surveys. Test both the AI drafting quality and the human review workflow. Measure time savings and error rates.
+
+**Phase 3 — Production and Expansion**
+Harden the system based on PoC findings. Expand to additional variable modules. Develop the legacy script ingestion pipeline at scale. Consider welfare aggregate variables only after demographic PoC succeeds.
+
+---
+
+*This document is a narrative introduction intended for team presentations. It does not supersede the formal Project Scope and Objectives document or the GMD 3.0 Guidelines.*

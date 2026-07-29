@@ -1,0 +1,294 @@
+---
+title: "AI-Assisted Harmonization of Household Surveys for the Global Micro Database (GMD)"
+---
+
+# Background and Motivation
+
+The production of global poverty and inequality statistics relies on the harmonization of household survey microdata collected by national statistical offices worldwide. These surveys differ substantially across countries and over time in terms of structure, variable naming, language, documentation quality, welfare definitions, and underlying concepts.
+
+To ensure comparability across countries and years, raw survey data must be standardized into a common format and harmonized to follow consistent methodological definitions (e.g., demographics, welfare aggregates, reference periods, weights). The result of this process is the Global Micro Database (GMD), which serves as the foundation for official poverty estimates.
+
+At present, the harmonization process is largely manual, survey-specific, and labor-intensive. It depends heavily on expert judgment, legacy scripts (often written many years ago), and institutional memory that is difficult to scale or systematically reuse. As the number of surveys, waves, and data users grows, this approach becomes increasingly costly, slow, and prone to inconsistency or error.
+
+Recent advances in artificial intelligence (AI), particularly large language models (LLMs), create an opportunity to assist the harmonization process. However, the direct use of AI systems to perform harmonization end-to-end would raise serious concerns regarding reproducibility, transparency, methodological governance, and auditability; all of which are essential for official World Bank estimates and global poverty monitoring.
+
+This concept note proposes a hybrid AI-assisted harmonization system that is designed to learn progressively from past harmonization decisions. Reviewed and approved mapping specifications, overrides, and QA outcomes are stored as structured artifacts and reused through retrieval mechanisms to inform future harmonizations. This enables systematic reuse of institutional knowledge without embedding methodological decisions implicitly within model weights. Where appropriate, and subject to evaluation and governance, selected components of the system may later be fine-tuned on historical decisions to improve efficiency. All learning mechanisms will be evaluated using out-of-sample surveys to ensure that performance gains reflect genuine generalization rather than overfitting to past cases.
+
+In a nutshell, this system accelerates interpretation and standardization while preserving human authority, methodological rigor, and deterministic execution.
+
+
+
+# Objectives
+
+The proposed system aims to:
+
+1.  Reduce the time and effort required to harmonize household surveys into the GMD.
+2.  Improve consistency and comparability across countries and over time.
+3.  Preserve transparency, reproducibility, and auditability of all harmonization decisions.
+4.  Systematically capture and reuse institutional knowledge from past harmonizations.
+5.  Enable a gradual transition away from legacy, survey-specific scripts toward a reusable, rule-based harmonization engine.
+
+
+
+# Core Design Principles
+
+The system is built on the following principles:
+
+-   **Separation of interpretation and execution**\
+    Interpretation of survey content (variable meaning, concepts, ambiguities) is separated from execution of transformations.
+
+-   **AI as an assistant, not an authority**\
+    AI systems propose mappings and transformations but never make final methodological decisions.
+
+-   **Human accountability**\
+    Expert analysts retain full responsibility for approving harmonization choices.
+
+-   **Deterministic execution**\
+    All approved decisions are executed by fixed, versioned code to guarantee reproducibility.
+
+-   **Explicit methodology**\
+    Harmonization rules, definitions, and assumptions are encoded explicitly into the system rather than implicitly embedded in scripts or models.
+
+-   **Progressive learning through explicit artifacts**\
+    The system improves over time by accumulating reviewed harmonization decisions and validated specifications, which are reused through retrieval and, optionally, model fine-tuning. Learning is explicit, testable, and governed, rather than implicit within a black-box model. 
+    
+*At no point does the AI system autonomously modify approved harmonization logic; any revision to harmonization specifications after approval requires explicit human review and re-approval.*
+
+Once a harmonization specification has been approved by a human expert, it is treated as immutable by the system and can only be revised through explicit human re-approval.
+
+# High-Level System Overview
+
+The harmonization process is organized into seven conceptual components, with a mandatory AI-assisted refinement loop operating prior to human approval:
+
+1.  Inputs
+2.  Survey Profiling
+3.  AI-Assisted Interpretation and Mapping
+4.  Human Review and Approval
+5.  GMD Harmonization Engine
+6.  Quality Assurance and Validation
+7.  Final Outputs and Audit Trail
+
+These components work together so that the harmonization engine executes approved specifications deterministically; AI may assist in proposing, testing, and diagnosing harmonization logic, but methodological authority and final approval always remain with human experts.
+
+Each component is described below.
+
+
+# System Components
+
+## Inputs
+
+The system consumes four categories of inputs:
+
+-   **Raw survey microdata**
+    Household and individual-level data in various formats (e.g., Stata, SPSS, SAS, CSV), potentially in multiple languages.
+
+-   **Survey documentation (when available)**
+    Questionnaires, codebooks, methodological notes, and ancillary materials.
+
+-   **Authoritative GMD methodology**
+    Canonical variable definitions, household and welfare concepts, aggregation rules, and comparability constraints.
+
+-   **Institutional knowledge**
+    Past harmonization decisions, legacy scripts, known country- or survey-specific quirks, and historical GMD outputs.
+
+
+## Survey Profiling (automatic)
+
+Each incoming survey is automatically profiled using deterministic code. 
+
+Survey profiling is an automatic, rule-based step that produces a structured description of each incoming survey, including variable metadata, basic statistical fingerprints, and inferred structural patterns. This profile does not apply any methodological definitions or transformations. Instead, it provides a standardized factual representation of the survey that supports AI-assisted interpretation, human review, and downstream quality assurance. 
+
+## AI-Assisted Interpretation and Mapping (Advisory)
+
+Using the survey profile and available documentation, an AI system assists by:
+
+-   Interpreting variable meaning across languages and naming conventions.
+-   Comparing the survey to similar previously harmonized surveys.
+-   Proposing candidate mappings between raw variables and GMD variables.
+-   Suggesting transformations (e.g., aggregation, recoding, unit adjustments).
+-   Flagging ambiguities, uncertainties, and questions requiring human judgment.
+
+The output of this step is a draft harmonization specification. This specification is structured, explicit, and reviewable, but it is not executable and not final.
+
+
+### Use of Past Decisions in AI-Assisted Mapping
+
+When processing a new survey, the AI-assisted interpretation component consults this repository to retrieve similar past cases, such as surveys from the same country, region, time period, or with comparable structure. Retrieved examples are used to:
+
+* Provide concrete precedents for variable interpretation.
+
+* Promote consistency in how recurring concepts are handled across surveys and over time.
+
+* Reduce reliance on ad hoc reasoning when documentation is sparse or ambiguous.
+
+Importantly, past decisions are used as context and guidance, not as binding rules. All proposed mappings remain subject to human review and approval.
+
+
+### Optional Model Fine-Tuning
+
+While the system does not require model training to function, the accumulated harmonization artifacts create the option for selective model fine-tuning at later stages. Fine-tuning would be considered only if it demonstrably improves efficiency or consistency and would be subject to explicit governance.
+
+Any such fine-tuning would be:
+- Based exclusively on approved historical decisions.
+- Evaluated using out-of-sample surveys not used during training.
+- Treated as an optimization layer, not a source of methodological authority.
+
+The default and primary learning mechanism remains retrieval and reuse of explicit past decisions, ensuring transparency, reversibility, and methodological control.
+
+
+### Mandatory AI-Assisted Build–Test–Repair Loop for Harmonization Specifications
+
+To further reduce manual effort while preserving methodological control, the proposed system incorporates a mandatory AI‑assisted build–test–repair loop as part of the harmonization workflow, prior to final human approval.
+
+Under this approach, the AI system iteratively refines harmonization artifacts (specifically the harmonization specification and, where necessary, limited survey‑specific code) by repeatedly executing the deterministic harmonization engine in a sandboxed, non‑production environment and validating the results against predefined GMD requirements. All surveys must pass through this sandbox loop before advancing to human review and approval.
+
+#### Mechanism
+
+The process operates as follows:
+
+1. The AI system generates a draft harmonization specification and, if required, bounded survey-specific code.
+2. The harmonization engine executes these artifacts in a sandboxed environment using the raw survey data.
+3. The resulting outputs are evaluated against a set of formal GMD invariants and validation rules, such as required schema elements, structural consistency, key integrity, and basic plausibility conditions.
+4. If mandatory conditions are not met, structured feedback is produced indicating which conditions failed.
+5. The AI system uses this feedback to revise the specification or code and retries execution.
+6. The process repeats until either:
+
+   * all mandatory conditions are satisfied, or
+   * predefined stop conditions are reached (e.g., maximum iterations, unresolved conceptual ambiguity).
+
+At no point does the AI system bypass the harmonization engine or alter methodological definitions. Iteration is strictly bounded by explicit rules and acceptance criteria.
+
+#### Governance and Safeguards
+
+This build–test–repair loop is designed with the following safeguards:
+
+* Deterministic acceptance criteria: All tests are based on predefined, transparent GMD requirements rather than subjective assessments.
+* Bounded scope: AI modifications are limited to harmonization specifications and clearly delimited code templates.
+* Auditability: Each iteration, including inputs, outputs, failures, and revisions, is logged and versioned.
+* Human authority: The final harmonization artifacts are always reviewed and approved by an expert harmonizer before being accepted into production.
+
+Bottom line: **Once approved, harmonization logic is immutable unless explicitly re-approved by a human**
+
+
+#### Role in the Overall System
+
+The purpose of this mechanism is not to delegate methodological decisions to AI, but to automate repetitive trial-and-error tasks involved in aligning survey-specific implementations with established GMD parameters. By doing so, it aims to reduce turnaround time and cognitive load for expert reviewers while maintaining full transparency, reproducibility, and accountability.
+
+
+
+
+## Human Review and Approval
+
+Expert harmonizers review the draft specification and:
+
+-   Validate or modify proposed mappings.
+-   Resolve conceptual ambiguities.
+-   Enforce GMD methodological definitions.
+-   Approve the final harmonization choices.
+
+This step establishes clear human accountability. All decisions, overrides, and justifications are recorded and become part of the institutional knowledge base for future surveys.
+
+
+## GMD Harmonization Engine (Deterministic Execution)
+
+The approved harmonization specification is passed to a reusable GMD Harmonization Engine, implemented in R (or Python).
+
+This engine:
+
+-   Reads the raw survey data.
+-   Applies the approved mappings and transformations.
+-   Constructs household and individual datasets according to the canonical GMD schema.
+-   Computes welfare aggregates and derived variables following fixed rules.
+-   Produces harmonized GMD-formatted microdata.
+
+AI is used to interpret surveys and draft harmonization specifications (and occasionally survey-specific glue code). Humans review and approve those specifications. A fixed R harmonization engine then executes the approved specifications deterministically to produce GMD. Over time, past approved specifications are reused to help AI propose better mappings, but execution always remains rule-based and reproducible.
+
+> **Clarification on execution authority vs. compute execution**
+>
+> *AI is allowed to generate code and trigger code execution in a controlled **non‑production sandbox** for the build–test–repair loop and for pre‑approval checks. In **production**, authoritative execution of harmonization is performed by the **deterministic Harmonization Engine** and pipeline/orchestrator after **explicit human approval**. AI does not autonomously execute official production harmonizations or modify approved specs.*
+
+
+## Quality Assurance and Validation
+
+Automated QA checks are applied to the harmonized outputs, including:
+
+-   Structural consistency (IDs, merges, weights).
+-   Logical constraints (valid ranges, internal consistency).
+-   Comparisons with previous survey waves to detect unexpected breaks.
+-   Summary diagnostics for analyst review.
+
+Quality assurance results may trigger controlled feedback loops to earlier stages of the harmonization process. Technical failures may be routed back to the AI-assisted specification refinement stage prior to human approval. 
+
+Any return to earlier stages triggered by QA results requires explicit human confirmation before harmonization outputs are revised or accepted.
+
+Conceptual or methodological issues identified during QA are escalated to expert reviewers, with AI providing diagnostic support but not autonomous corrections. 
+
+
+## Final Outputs and Audit Trail
+
+
+For each harmonized survey, the system records a set of structured artifacts, including:
+
+* The final approved harmonization specification, documenting how raw survey variables were mapped to GMD variables and which transformations were applied.
+
+* Human overrides and justifications, capturing where expert judgment modified or rejected automated suggestions.
+
+* Quality assurance outcomes, including validation results, warnings, and identified issues.
+
+* Relevant contextual metadata, such as country, year, survey instrument, and links to documentation.
+
+Together, these artifacts form a curated and versioned repository of past harmonization decisions that represents institutional memory in a reusable and auditable form.
+
+
+# Why This Approach (and Not generative AI Alone)
+
+While general-purpose AI systems (e.g., ChatGPT- or Gemini-style models) are powerful tools for interpretation and exploration, they are not suitable as standalone solutions for producing official statistics. Such systems are probabilistic, non-deterministic, and embed assumptions implicitly within model weights.
+
+In contrast, the proposed system:
+
+-   Makes methodology explicit and enforceable.
+-   Guarantees reproducibility across time and model versions.
+-   Preserves human responsibility for methodological decisions.
+-   Uses AI where it is strongest (interpretation and pattern recognition) and avoids it where it is weakest (final authority and execution).
+
+
+# Expected Benefits
+
+- **Significant reduction in harmonization time per survey**, enabling faster updates of the GMD and freeing analysts to focus on review and methodological work.
+- **Improved quality and consistency across countries and survey waves**, with automated cross-checks helping detect human errors present in legacy harmonizations.
+- **Reduced dependence on fragile, survey‑specific legacy scripts** and lower vulnerability to staffing constraints, making the harmonization process more sustainable under budget and STC limitations.
+- **Better documentation and stronger institutional memory**, with specifications, decisions, and metadata captured systematically instead of residing in ad‑hoc files or individual knowledge.
+- **A scalable and maintainable foundation for future GMD expansion**, including the addition of new variables such as asset modules and detailed consumption categories.
+- **Improved discoverability of questionnaires and raw survey materials**, helping teams understand what information exists even when it is not harmonized.
+- **More complete and reliable metadata for poverty measurement**, including systematic capture of welfare components and methodological notes across surveys.
+
+
+# Next Steps
+
+This concept note defines the target process, governance model, and conceptual architecture for AI-assisted harmonization of household surveys into the GMD. It is intentionally implementation-agnostic with respect to technical infrastructure, tooling, and deployment choices.
+
+The proposed next steps are therefore:
+
+* Formalize the harmonization specification framework, including its structure, required metadata, and approval workflow.
+
+* Define the canonical GMD schema and acceptance criteria, including formal invariants and quality assurance rules.
+
+* Identify a representative set of pilot surveys to validate the approach across different countries, instruments, and documentation conditions.
+
+* Design an evaluation framework to assess efficiency gains, consistency, and out-of-sample performance during the pilot phase.
+
+* Develop a separate technical design document, to be discussed and agreed upon with relevant technical, security, and governance stakeholders, covering infrastructure, execution environments, and system integration.
+
+This phased approach allows methodological and governance questions to be resolved first, before committing to specific technical or infrastructural implementations.
+
+
+# Open Questions (to be addressed later)
+
+-   Governance model for approving methodological changes.
+-   Data security and compliance requirements.
+-   Integration with existing production pipelines.
+-   Criteria for selecting pilot surveys.
+-   Long-term maintenance and ownership.
+
+
+**NOTE:** *Technical architecture, infrastructure, and tooling choices are explicitly out of scope for this document and will be addressed in a separate technical design phase.*

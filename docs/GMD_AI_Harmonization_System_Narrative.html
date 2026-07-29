@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="GMD Harmonization Team">
+
+<title>How the GMD AI-Assisted Harmonization System Works</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/clipboard/clipboard.min.js"></script>
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/popper.min.js"></script>
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/anchor.min.js"></script>
+<link href="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="GMD_AI_Harmonization_System_Narrative_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="GMD_AI_Harmonization_System_Narrative_files/libs/bootstrap/bootstrap-8ffd5f67044e5306d9846f29df41dda5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="GMD_AI_Harmonization_System_Narrative_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#the-problem-this-system-is-solving" id="toc-the-problem-this-system-is-solving" class="nav-link active" data-scroll-target="#the-problem-this-system-is-solving"><span class="header-section-number">1</span> The Problem This System Is Solving</a></li>
+  <li><a href="#what-the-system-does-and-what-it-does-not-do" id="toc-what-the-system-does-and-what-it-does-not-do" class="nav-link" data-scroll-target="#what-the-system-does-and-what-it-does-not-do"><span class="header-section-number">2</span> What the System Does — and What It Does Not Do</a></li>
+  <li><a href="#the-full-pipeline-at-a-glance" id="toc-the-full-pipeline-at-a-glance" class="nav-link" data-scroll-target="#the-full-pipeline-at-a-glance"><span class="header-section-number">3</span> The Full Pipeline at a Glance</a></li>
+  <li><a href="#the-four-permanent-input-sources" id="toc-the-four-permanent-input-sources" class="nav-link" data-scroll-target="#the-four-permanent-input-sources"><span class="header-section-number">4</span> The Four Permanent Input Sources</a>
+  <ul class="collapse">
+  <li><a href="#raw-microdata" id="toc-raw-microdata" class="nav-link" data-scroll-target="#raw-microdata"><span class="header-section-number">4.1</span> Raw microdata</a></li>
+  <li><a href="#survey-documentation" id="toc-survey-documentation" class="nav-link" data-scroll-target="#survey-documentation"><span class="header-section-number">4.2</span> Survey documentation</a></li>
+  <li><a href="#historical-decisions-database" id="toc-historical-decisions-database" class="nav-link" data-scroll-target="#historical-decisions-database"><span class="header-section-number">4.3</span> Historical decisions database</a></li>
+  <li><a href="#gmd-schema-and-guidelines" id="toc-gmd-schema-and-guidelines" class="nav-link" data-scroll-target="#gmd-schema-and-guidelines"><span class="header-section-number">4.4</span> GMD schema and guidelines</a></li>
+  </ul></li>
+  <li><a href="#stage-one-pre-processing-converting-everything-to-structured-schemas" id="toc-stage-one-pre-processing-converting-everything-to-structured-schemas" class="nav-link" data-scroll-target="#stage-one-pre-processing-converting-everything-to-structured-schemas"><span class="header-section-number">5</span> Stage One: Pre-Processing — Converting Everything to Structured Schemas</a>
+  <ul class="collapse">
+  <li><a href="#the-data-profiling-track" id="toc-the-data-profiling-track" class="nav-link" data-scroll-target="#the-data-profiling-track"><span class="header-section-number">5.1</span> The data profiling track</a></li>
+  <li><a href="#the-documentation-parsing-track" id="toc-the-documentation-parsing-track" class="nav-link" data-scroll-target="#the-documentation-parsing-track"><span class="header-section-number">5.2</span> The documentation parsing track</a></li>
+  </ul></li>
+  <li><a href="#stage-two-ai-drafting-reasoning-toward-a-harmonization-specification" id="toc-stage-two-ai-drafting-reasoning-toward-a-harmonization-specification" class="nav-link" data-scroll-target="#stage-two-ai-drafting-reasoning-toward-a-harmonization-specification"><span class="header-section-number">6</span> Stage Two: AI Drafting — Reasoning Toward a Harmonization Specification</a></li>
+  <li><a href="#stage-three-human-review-where-judgment-is-applied" id="toc-stage-three-human-review-where-judgment-is-applied" class="nav-link" data-scroll-target="#stage-three-human-review-where-judgment-is-applied"><span class="header-section-number">7</span> Stage Three: Human Review — Where Judgment Is Applied</a></li>
+  <li><a href="#stage-four-execution-turning-decisions-into-data" id="toc-stage-four-execution-turning-decisions-into-data" class="nav-link" data-scroll-target="#stage-four-execution-turning-decisions-into-data"><span class="header-section-number">8</span> Stage Four: Execution — Turning Decisions into Data</a></li>
+  <li><a href="#stage-five-quality-assurance-automated-validation" id="toc-stage-five-quality-assurance-automated-validation" class="nav-link" data-scroll-target="#stage-five-quality-assurance-automated-validation"><span class="header-section-number">9</span> Stage Five: Quality Assurance — Automated Validation</a></li>
+  <li><a href="#stage-six-outputs-and-the-learning-loop" id="toc-stage-six-outputs-and-the-learning-loop" class="nav-link" data-scroll-target="#stage-six-outputs-and-the-learning-loop"><span class="header-section-number">10</span> Stage Six: Outputs and the Learning Loop</a></li>
+  <li><a href="#the-infrastructure-underneath" id="toc-the-infrastructure-underneath" class="nav-link" data-scroll-target="#the-infrastructure-underneath"><span class="header-section-number">11</span> The Infrastructure Underneath</a></li>
+  <li><a href="#the-role-of-schemas-the-real-design-challenge" id="toc-the-role-of-schemas-the-real-design-challenge" class="nav-link" data-scroll-target="#the-role-of-schemas-the-real-design-challenge"><span class="header-section-number">12</span> The Role of Schemas: The Real Design Challenge</a></li>
+  <li><a href="#what-this-means-for-the-gmd-team-in-practice" id="toc-what-this-means-for-the-gmd-team-in-practice" class="nav-link" data-scroll-target="#what-this-means-for-the-gmd-team-in-practice"><span class="header-section-number">13</span> What This Means for the GMD Team in Practice</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">14</span> Summary</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="GMD_AI_Harmonization_System_Narrative.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li><li><a href="GMD_AI_Harmonization_System_Narrative.docx"><i class="bi bi-file-word"></i>MS Word</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">How the GMD AI-Assisted Harmonization System Works</h1>
+<p class="subtitle lead">A Process Narrative for the Global Monitoring Database</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>GMD Harmonization Team </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="block-title">Abstract</div>
+    <p>This document explains, from beginning to end, how the AI-assisted harmonization pipeline for the Global Monitoring Database (GMD) works. It is written as a process narrative — following the journey of a survey through the system from arrival to final output — and is intended for anyone who needs to understand the system: team members who will operate it, technical staff who will build it, and stakeholders who need to evaluate it. Technical terms are introduced and explained as they appear.</p>
+  </div>
+</div>
+
+
+</header>
+
+
+<section id="the-problem-this-system-is-solving" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> The Problem This System Is Solving</h1>
+<p>Every year, the Global Monitoring Database (GMD) team at the World Bank ingests hundreds of household survey datasets from countries around the world. Each survey is different. Different countries use different questionnaires, different variable names, different coding schemes, and different ways of categorizing the same underlying concepts. A survey from Bangladesh might record education in one way; a survey from Peru records it in another. Before any of this data can be used for international comparisons of poverty, welfare, or living standards, it must be <em>harmonized</em> — converted into a single, standardized format that allows meaningful comparison across countries and years.</p>
+<p>Harmonization is expert work. It requires an analyst to read the survey documentation, understand what each variable in the raw data actually measures, and then write a transformation script — typically in the statistical programming language Stata — that converts each raw variable into its GMD equivalent. For a single survey, this process can take days. For a database that handles hundreds of surveys per year, the cumulative burden is enormous.</p>
+<p>The challenge is compounded by the fact that harmonization decisions are often not formally documented. They live in scripts, in email threads, in the memory of individual team members. When a team member leaves, or when a survey needs to be re-harmonized years later, the reasoning behind past decisions is difficult to recover. Errors are hard to audit. Inconsistencies across surveys are hard to detect.</p>
+<p>This is the problem the AI-assisted harmonization system is designed to address.</p>
+<hr>
+</section>
+<section id="what-the-system-does-and-what-it-does-not-do" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> What the System Does — and What It Does Not Do</h1>
+<p>Before describing how the system works, it is important to be clear about what it does and does not do.</p>
+<p>The system <strong>does</strong> read survey documentation and raw data, reason about how each raw variable maps to the GMD standard, and produce a structured draft of the harmonization decisions. It draws on past decisions to inform its reasoning. It checks its own work against formal rules before presenting it for review.</p>
+<p>The system <strong>does not</strong> make final decisions. Every mapping it proposes must be reviewed, approved, and signed off by a human expert before it is ever executed. The system is designed to accelerate and standardize the <em>first draft</em>, not to replace judgment. The human reviewer remains the methodological authority.</p>
+<p>This distinction is fundamental. It shapes every design choice in the system, from how the AI is instructed to how the outputs are stored.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Harmonization Specification</strong></p>
+<p>The central artifact of this system is a document called the Harmonization Specification. It is a structured, machine-readable file — formatted as JSON, a standard data exchange format — that records, for every variable in a survey, exactly what transformation is proposed: which GMD variable it maps to, what recoding is needed, what confidence level the AI assigned, and what reasoning was used. This document is what the human reviews and approves. Nothing is executed without an approved Specification.</p>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="the-full-pipeline-at-a-glance" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> The Full Pipeline at a Glance</h1>
+<p>The diagram below shows the complete process. Each stage is described in detail in the sections that follow.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div id="fig-pipeline" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-pipeline">flowchart LR
+    classDef db     fill:#0d2137,stroke:#4a90d9,color:#b8d4ee
+    classDef auto   fill:#1a3a5c,stroke:#4a90d9,color:#e6edf3
+    classDef ai     fill:#2d1a4e,stroke:#9b59b6,color:#e6edf3
+    classDef human  fill:#3d2800,stroke:#e6a817,color:#e6edf3
+    classDef engine fill:#0d3320,stroke:#27ae60,color:#e6edf3
+
+    subgraph SRC["Permanent input sources"]
+        direction TB
+        RAW[("Raw microdata\nStata · CSV")]
+        DOC[("Survey documentation\nPDF · Excel · codebooks")]
+        HIST[("Historical decisions\ndo2screen → historical DB")]
+        GMDS[("GMD schema\n&amp; guidelines")]
+    end
+
+    subgraph PREP["Pre-processing: convert everything to structured schemas"]
+        direction TB
+        PROF["Data profiling\n🔍 Automated\ntypes · stats · missings\ncategories · labels"]
+        PARSE["Documentation parsing\n🤖 AI-assisted\nquestion text · codes\nskip patterns · structure"]
+    end
+
+    AI["② AI Drafting\n🤖 RAG + LLM\nagent sandbox loop"]
+    REV["③ Human Review\n👤 Approve / reject\n/ annotate"]
+    EXEC["④ Execution\n⚙️ Deterministic\nengine"]
+    QA["⑤ QA\n✅ Automated\nvalidation"]
+    OUT["⑥ Outputs\n📦 GMD data\n+ audit trail"]
+
+    RAW --&gt; PROF
+    DOC --&gt; PARSE
+    PROF --&gt;|"Data profile schema"| AI
+    PARSE --&gt;|"Documentation schema"| AI
+    PARSE -.-&gt;|"No DDI? Store\nas synthetic DDI"| DOC
+    HIST --&gt; AI
+    GMDS --&gt; AI
+    AI -.-&gt;|"Internal loop:\nrefine until\nown tests pass"| AI
+    AI --&gt;|"Draft ready"| REV
+    REV --&gt;|"Approved"| EXEC
+    REV --&gt;|"Rejected + feedback"| AI
+    EXEC --&gt; QA
+    QA --&gt;|"Pass"| OUT
+    QA --&gt;|"Fail"| REV
+    OUT -.-&gt;|"Save-back:\nnew precedent"| HIST
+
+    class RAW,DOC,HIST,GMDS db
+    class PROF auto
+    class PARSE,AI ai
+    class REV human
+    class EXEC,QA,OUT engine
+</pre>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The GMD AI-assisted harmonization pipeline
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="the-four-permanent-input-sources" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> The Four Permanent Input Sources</h1>
+<p>The system draws on four sources of information that are always present, regardless of which survey is being harmonized. Three of them grow richer over time as the system learns.</p>
+<section id="raw-microdata" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="raw-microdata"><span class="header-section-number">4.1</span> Raw microdata</h2>
+<p>This is the actual survey dataset — the file that contains one row per household or individual, with columns for each variable. It typically arrives as a Stata <code>.dta</code> file, though CSV and other formats are also supported. The raw microdata is the ground truth of what was actually recorded in the survey.</p>
+<p>The raw microdata is stored securely in a centralized file storage system (Azure Blob Storage) where all pipeline components can access it. Crucially, the raw microdata is never sent to the AI system directly. Instead, it is first processed into a structured summary — described in the next section — and only that summary reaches the AI.</p>
+</section>
+<section id="survey-documentation" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="survey-documentation"><span class="header-section-number">4.2</span> Survey documentation</h2>
+<p>This includes any documentation that came with the survey: questionnaire PDFs, codebooks in Excel or Word format, interviewer manuals, variable lists, or any other reference material that explains what the survey variables mean. In the ideal case, this also includes a <strong>DDI file</strong>.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>DDI — Data Documentation Initiative</strong></p>
+<p>A DDI file is a structured, machine-readable XML file that contains standardized metadata about a survey: variable names, question text, response categories, universe descriptions (who was asked each question), and survey methodology notes. It is the international standard for documenting household survey data. Many surveys archived in the World Bank’s Microdata Library have DDI files available via a public API. Where a DDI exists, it is the richest and most reliable source of documentation for the system.</p>
+</div>
+</div>
+</div>
+<p>Not all surveys have DDI files. Many arrive with only a PDF questionnaire or an unstructured codebook. This is precisely why the documentation parsing stage (described below) exists: to extract and structure whatever documentation is available into a consistent format the AI can use.</p>
+</section>
+<section id="historical-decisions-database" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="historical-decisions-database"><span class="header-section-number">4.3</span> Historical decisions database</h2>
+<p>This is the system’s institutional memory. It contains structured records of every harmonization decision that has ever been made and approved within the system — which raw variable was mapped to which GMD variable, what transformation was applied, what situation was declared (direct mapping, inferred mapping, not mappable), and any notes the reviewer added.</p>
+<p>Over time, this database becomes the most valuable input source of all. It encodes decades of expert judgment in a form the AI can search and reason with. The database is initially seeded from legacy Stata harmonization scripts using a purpose-built tool called <strong>do2screen</strong>, described in the next section.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>do2screen</strong></p>
+<p><code>do2screen</code> is a Stata <code>ado</code> program developed by the GMD team that reads a Stata harmonization script (a <code>.do</code> file) and extracts, in structured form, the transformation decisions it encodes — which variables were recoded, how, and from what source. This makes it possible to convert years of existing harmonization work into structured records that can populate the historical decisions database, without having to re-document everything manually.</p>
+</div>
+</div>
+</div>
+<p>The historical database uses a technology called a <strong>vector database</strong>, which allows the AI to retrieve relevant past decisions through similarity search rather than exact matching. When the AI is reasoning about an education variable with an unusual coding scheme, it can ask the database: <em>“Find me past decisions about education variables from surveys with similar characteristics”</em> — and receive the closest matches, even if no exact precedent exists.</p>
+</section>
+<section id="gmd-schema-and-guidelines" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="gmd-schema-and-guidelines"><span class="header-section-number">4.4</span> GMD schema and guidelines</h2>
+<p>This is the authoritative definition of every GMD target variable: its name, label, valid values, data type, and derivation rules. It is stored in a structured relational database and is the final authority in all cases of conflict. If a historical precedent suggests something that contradicts the GMD schema, the schema wins — always. The schema database is what ensures that no matter how many different surveys the system processes, all outputs conform to the same standard.</p>
+<hr>
+</section>
+</section>
+<section id="stage-one-pre-processing-converting-everything-to-structured-schemas" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Stage One: Pre-Processing — Converting Everything to Structured Schemas</h1>
+<p>The fundamental principle underlying the entire system is this: <strong>no downstream stage should ever receive unstructured input.</strong> The AI drafting stage should not try to read a raw PDF. It should not try to interpret a Stata binary file. It should receive only clean, consistently structured data — information that has already been organized into a well-defined template. The job of the pre-processing stage is to make this happen.</p>
+<p>Pre-processing has two parallel tracks that run simultaneously.</p>
+<section id="the-data-profiling-track" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="the-data-profiling-track"><span class="header-section-number">5.1</span> The data profiling track</h2>
+<p>The data profiling step reads the raw microdata file and computes a comprehensive structured summary of what it contains. This is entirely automated — no AI is involved. It is, in essence, a sophisticated version of what a data analyst would do when first exploring a new dataset: running <code>codebook</code> in Stata, or <code>str()</code> and <code>summary()</code> in R.</p>
+<p>The output is a <strong>data profile schema</strong> — a structured JSON document that contains, for every variable in the dataset:</p>
+<ul>
+<li>The variable name and any embedded label</li>
+<li>The data type and storage class (numeric, string, byte, integer, float, and so on)</li>
+<li>Summary statistics for numeric variables (mean, standard deviation, minimum, maximum, percentiles)</li>
+<li>The count of missing values and the missing rate</li>
+<li>For categorical or string variables: the number of distinct values and a frequency table of the most common values</li>
+<li>The total number of observations in the dataset</li>
+</ul>
+<p>This profile tells the AI what the data actually looks like in practice — information that may differ significantly from what the documentation says. A codebook might list a variable as having five response categories; the actual data might contain three, or seven, or include unexpected codes that indicate data quality issues. The profile captures reality.</p>
+</section>
+<section id="the-documentation-parsing-track" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="the-documentation-parsing-track"><span class="header-section-number">5.2</span> The documentation parsing track</h2>
+<p>Simultaneously, the documentation parsing step processes any available survey documentation. Unlike data profiling, this step is AI-assisted: it uses a language model to read unstructured documents and extract their content into a structured format.</p>
+<p>The reason AI is needed here is that survey documentation varies enormously. One survey’s codebook is a tidy Excel table. Another’s is a scanned PDF of a paper questionnaire from 1998. A third is a Word document with inconsistent formatting and embedded footnotes. A purely mechanical parser would fail on many of these. A language model can read them all and extract the same kinds of information regardless of format.</p>
+<p>The output is a <strong>documentation schema</strong> — another structured JSON document that captures, for every variable mentioned in the documentation:</p>
+<ul>
+<li>The question text as it was asked</li>
+<li>The list of response categories and their numeric codes</li>
+<li>The universe: who was asked this question (all adults, only employed individuals, households with children, and so on)</li>
+<li>Any notes or caveats from the questionnaire</li>
+<li>The section of the questionnaire where the variable appears</li>
+</ul>
+<p>When a DDI file is available, the documentation parsing step reads it directly — DDI files are already structured and can be parsed more reliably. When no DDI exists, the AI extracts what it can from whatever documentation is available.</p>
+<div class="callout callout-style-simple callout-important">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>A valuable byproduct: synthetic DDI creation</strong></p>
+<p>When a survey has no DDI file, the documentation schema produced by the parsing step is rich enough to serve as one. The system stores it back into the documentation database, effectively creating a synthetic DDI for the survey. Over time, this means the system is not only harmonizing surveys but also building out documentation coverage for surveys that were previously underdocumented. For the GMD team, which intends to create DDIs for new harmonized surveys, this is the natural mechanism for doing so.</p>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="stage-two-ai-drafting-reasoning-toward-a-harmonization-specification" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Stage Two: AI Drafting — Reasoning Toward a Harmonization Specification</h1>
+<p>Once both pre-processing tracks are complete, the AI drafting stage begins. This is where the intelligence of the system is concentrated.</p>
+<p>The AI receives four inputs simultaneously:</p>
+<ol type="1">
+<li>The <strong>data profile schema</strong> — what the raw data actually contains</li>
+<li>The <strong>documentation schema</strong> — what the survey documentation says the variables mean</li>
+<li><strong>Relevant historical decisions</strong> — retrieved from the historical database by searching for past decisions about similar variables and similar surveys</li>
+<li>The <strong>GMD schema</strong> — the authoritative definitions of all target variables</li>
+</ol>
+<p>Working with these four inputs, the AI reasons about each variable in the survey and proposes a mapping to the GMD standard. For each variable, it must answer a set of questions: Does this variable correspond to a GMD target variable? If so, which one? Is the mapping direct (the values need no transformation) or does it require recoding? Are there any complications — unexpected values, missing documentation, ambiguous categories — that a human reviewer should know about?</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>RAG — Retrieval-Augmented Generation</strong></p>
+<p>RAG is the technical term for the mechanism by which the AI searches the historical database before generating its proposals. Rather than relying purely on its general training, the AI first <em>retrieves</em> the most relevant past decisions from the historical database and then uses those as context when <em>generating</em> its draft. This is what allows the system to reflect the GMD team’s specific institutional conventions and past choices, not just general statistical knowledge.</p>
+</div>
+</div>
+</div>
+<p>The AI does not simply produce one draft and stop. It operates in an internal <strong>sandbox loop</strong>: it generates a draft specification, runs internal consistency checks against the GMD schema, identifies any contradictions or obvious errors, revises its proposals, and repeats until its own tests pass. Only then does it present the draft to the human reviewer. This means the reviewer receives a draft that has already passed a first round of automated quality checks — not a raw, unvetted output.</p>
+<p>The result of this stage is the <strong>Harmonization Specification</strong>: a structured JSON document listing every variable-level mapping decision, the AI’s confidence level, its reasoning, and the historical precedents it drew on. This document is saved to centralized storage where the Review Application can read it.</p>
+<hr>
+</section>
+<section id="stage-three-human-review-where-judgment-is-applied" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Stage Three: Human Review — Where Judgment Is Applied</h1>
+<p>The Harmonization Specification is a machine-generated proposal. Nothing in it has authority until a human expert reviews and approves it. This is not a formality — it is the methodological core of the system.</p>
+<p>When a new draft Specification is saved to storage, the reviewer is automatically notified and opens it in the <strong>Review Application</strong>: a purpose-built web interface that presents the draft in a readable, interactive format. The reviewer sees, for each variable, the source variable and its documentation, the proposed GMD target, the AI’s reasoning, and the historical precedents cited. They can approve the mapping as proposed, reject it and send it back to the AI with written feedback, or annotate it with caveats and corrections before approving.</p>
+<p>The Review Application reads from and writes back to the same centralized storage that the rest of the pipeline uses. It is the only point in the system where a human directly interacts with the pipeline’s state.</p>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>The rejection loop</strong></p>
+<p>When a reviewer rejects a mapping, the rejection is not simply discarded. It is sent back to the AI drafting stage as structured feedback: what was wrong, why it was rejected, and what the reviewer expects to see instead. The AI revises the relevant portions of the specification and resubmits for review. This loop can repeat as many times as necessary. Every revision and the reasons for it are logged in the audit trail.</p>
+</div>
+</div>
+</div>
+<p>When the reviewer is satisfied with the full Specification and approves it, the approved version is saved back to storage. This triggers the next stage automatically.</p>
+<hr>
+</section>
+<section id="stage-four-execution-turning-decisions-into-data" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Stage Four: Execution — Turning Decisions into Data</h1>
+<p>The execution stage takes the approved Harmonization Specification and implements it on the raw microdata. This stage is entirely <strong>deterministic</strong>: it involves no AI, no probabilistic reasoning, and no judgment. It is code that reads a specification and applies it precisely.</p>
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Deterministic code</strong></p>
+<p>Deterministic means that given the same inputs, the code always produces exactly the same output. There is no randomness, no model inference, no approximation. An approved Specification, applied to the same raw data file by the execution engine, will always produce the same harmonized dataset — on the first run, on the hundredth run, and five years from now. This reproducibility is essential for a system that feeds official statistics.</p>
+</div>
+</div>
+</div>
+<p>The execution engine reads the approved Specification, loads the raw microdata, and applies each transformation in sequence: renaming variables, recoding values, computing derived variables from atomic inputs, and applying any filters or conditions specified. It does not interpret the Specification — it executes it exactly as written.</p>
+<p>This strict separation between the <em>decision</em> (made by the AI and approved by the human in the Specification) and the <em>execution</em> (performed mechanically by the engine) is one of the most important design choices in the system. It means that every harmonization output is fully explainable: anyone can look at the approved Specification and the execution log and understand exactly what happened and why, without having to reason about what an AI “might have been thinking.”</p>
+<hr>
+</section>
+<section id="stage-five-quality-assurance-automated-validation" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Stage Five: Quality Assurance — Automated Validation</h1>
+<p>Before any output is considered final, it passes through an automated quality assurance stage. The QA engine compares the harmonized dataset against the GMD schema to verify that every output variable falls within its defined valid range, has the correct data type, meets completeness requirements, and is internally consistent with related variables.</p>
+<p>Examples of checks performed: Is the age variable non-negative and within a plausible range? Do the education category codes match the GMD enumeration exactly? Is the urban/rural indicator binary with no missing values above the acceptable threshold? Are household-level and individual-level variables consistent with each other?</p>
+<p>If all checks pass, the output moves to the final stage. If any check fails, the failed output is not stored as final — instead, it is flagged and sent back to the human review stage with a detailed report of which checks failed and why. The reviewer then determines whether the issue lies in the Specification (requiring a revision) or in the raw data (requiring a note in the output documentation).</p>
+<hr>
+</section>
+<section id="stage-six-outputs-and-the-learning-loop" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Stage Six: Outputs and the Learning Loop</h1>
+<p>A harmonized survey that passes QA produces two categories of output.</p>
+<p>The first is the <strong>harmonized GMD dataset</strong> itself: a clean, standardized microdata file in which all variables conform to the GMD schema, ready for integration into the database. This file is accompanied by a complete <strong>audit trail</strong> — a permanent, immutable record of every decision made during the harmonization process: what inputs were used, which version of the Specification was approved, who approved it and when, what the QA results were, and any revisions or annotations made during review.</p>
+<p>The audit trail means that the question <em>“How was this variable harmonized, and why?”</em> can always be answered precisely — not approximately, not from memory, but from a queryable record.</p>
+<p>The second output is less visible but equally important: the <strong>save-back to the historical decisions database</strong>. Every approved harmonization decision — every variable mapping that passed review and QA — is stored back into the historical database as a new precedent. The next time the system encounters a similar survey, it will have this decision available as a reference.</p>
+<p>This is how the system improves over time. Early in its life, it draws on legacy Stata scripts converted via do2screen. As it processes more surveys, it accumulates a richer and richer base of vetted decisions. The quality of its drafts improves. The reviewer’s workload decreases. The gap between what the AI proposes and what the human would have decided independently narrows.</p>
+<p>This learning loop is not automatic in the sense of unsupervised machine learning: no decision enters the historical database without human approval. Every precedent in the database has been validated by a domain expert. This is what makes the institutional memory trustworthy.</p>
+<hr>
+</section>
+<section id="the-infrastructure-underneath" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> The Infrastructure Underneath</h1>
+<p>All of the above requires a set of cloud infrastructure components to function. These are described in detail in the accompanying <em>Infrastructure Requirements</em> document prepared for ITS. In summary, the system relies on seven components:</p>
+<table class="caption-top table">
+<caption>Infrastructure components</caption>
+<colgroup>
+<col style="width: 35%">
+<col style="width: 65%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>File storage</strong> (Azure Blob Storage)</td>
+<td>Holds all raw files, processed schemas, approved specifications, and outputs</td>
+</tr>
+<tr class="even">
+<td><strong>Rules database</strong> (Azure SQL)</td>
+<td>Stores the canonical GMD schema — always the final authority</td>
+</tr>
+<tr class="odd">
+<td><strong>AI language model</strong> (Azure OpenAI Service)</td>
+<td>The engine behind documentation parsing and AI drafting</td>
+</tr>
+<tr class="even">
+<td><strong>Historical decisions database</strong> (Azure AI Search)</td>
+<td>Stores and retrieves past harmonization decisions via similarity search</td>
+</tr>
+<tr class="odd">
+<td><strong>Compute environment</strong> (Azure Kubernetes Service)</td>
+<td>Runs all pipeline jobs on demand, with team-managed deployment</td>
+</tr>
+<tr class="even">
+<td><strong>Audit trail and monitoring</strong> (Azure Monitor)</td>
+<td>Records every system action for accountability and debugging</td>
+</tr>
+<tr class="odd">
+<td><strong>Review Application</strong> (Posit Connect or Azure-hosted)</td>
+<td>The web interface through which human reviewers interact with the pipeline</td>
+</tr>
+</tbody>
+</table>
+<p>The most critical infrastructure question — and the one that must be resolved before any other design can be finalized — is whether <strong>Azure OpenAI Service</strong> is approved for use in the World Bank Group’s Azure tenant. This is the enterprise version of the AI language model, designed to meet the data residency and security requirements of organizations like the World Bank. Without it, the documentation parsing and AI drafting stages cannot function as designed. All other questions are secondary to this one.</p>
+<hr>
+</section>
+<section id="the-role-of-schemas-the-real-design-challenge" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> The Role of Schemas: The Real Design Challenge</h1>
+<p>It is tempting to think of this system as primarily an AI system. It is not. It is primarily a <strong>schema design system</strong> in which AI plays a supporting role.</p>
+<p>Every stage of the pipeline is, at its core, a conversion from a less structured form to a more structured one:</p>
+<ul>
+<li>Survey documentation (unstructured PDF) → Documentation schema (structured JSON)</li>
+<li>Raw microdata (binary Stata file) → Data profile schema (structured JSON)</li>
+<li>Both schemas, combined with rules and precedents → Harmonization Specification (structured JSON)</li>
+<li>Approved Specification → Harmonized GMD data (structured dataset)</li>
+</ul>
+<p>The quality of the AI’s output is directly proportional to the quality of the schemas it receives as input. A vague, inconsistently defined documentation schema produces vague AI proposals. A precisely defined schema, in which every field has a clear meaning and every value has a constrained range, produces consistent, auditable proposals.</p>
+<p>This means that before any code is written and before any AI is prompted, the team must carefully define:</p>
+<ol type="1">
+<li><strong>The data profile schema</strong>: exactly what fields the automated profiling step produces for each variable</li>
+<li><strong>The documentation schema</strong>: exactly what fields the documentation parsing step extracts from questionnaires and codebooks</li>
+<li><strong>The Harmonization Specification format</strong>: exactly what fields and values are valid for each variable-level mapping decision</li>
+</ol>
+<p>These three schemas are the contracts between pipeline stages. Getting them right is the highest-leverage design work in the project.</p>
+<hr>
+</section>
+<section id="what-this-means-for-the-gmd-team-in-practice" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> What This Means for the GMD Team in Practice</h1>
+<p>For a harmonizer working with this system, the day-to-day experience changes in a specific and bounded way. The mechanical first-draft work — reading documentation, proposing mappings, writing transformation logic — is handled by the system. The harmonizer’s time is redirected toward the work that requires genuine judgment: reviewing proposals, catching edge cases the AI missed, annotating unusual situations, and making the final call on ambiguous mappings.</p>
+<p>The save-back loop means that every judgment a harmonizer makes is preserved permanently, attributed to them, and available to inform future work. Over time, the team builds not just a database of decisions but a structured record of <em>reasoning</em>: why a particular approach was chosen for a particular kind of survey, what the known complications are for specific country contexts, how the team has resolved recurring ambiguities in the past. This institutional knowledge, which today lives largely in individual memories and scattered scripts, becomes a shared, searchable, durable resource.</p>
+<p>For the proof of concept, the system covers non-welfare demographic variables: gender, age, education, urban/rural classification, household relationships, and labor force status. Welfare aggregates — consumption and income — are explicitly out of scope until the proof of concept demonstrates that the methodology is sound for simpler variables. The volume is approximately 100–200 new surveys per year, beginning with a representative subset.</p>
+<hr>
+</section>
+<section id="summary" class="level1" data-number="14">
+<h1 data-number="14"><span class="header-section-number">14</span> Summary</h1>
+<p>The GMD AI-assisted harmonization system is best understood not as an AI that harmonizes surveys, but as a structured pipeline that converts unstructured inputs into structured outputs at every stage, with human judgment applied at the decisive moment before any transformation is executed.</p>
+<p>A new survey arrives. Its raw data is profiled automatically. Its documentation is parsed by an AI agent into a structured schema. Both schemas, together with the GMD rules and years of historical decisions, are handed to an AI drafting agent that proposes a complete Harmonization Specification. That Specification is reviewed and approved by a human expert using a purpose-built review interface. Once approved, a deterministic execution engine applies the Specification to the raw data. Automated quality checks validate the output. The final harmonized dataset, complete with a full audit trail, is stored. And the approved decision is saved back into the historical database, making the system incrementally smarter for the next survey.</p>
+<p>The system does not remove expertise from harmonization. It amplifies it — by encoding past expertise into a form that can inform future work, and by redirecting current expertise toward the decisions that actually require it.</p>
+<hr>
+<p><em>GMD Harmonization Team · Development Data Group · World Bank Group · May 2026 · DRAFT v1.0</em></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,585 @@
+// GMD AI Harmonization — Custom Reveal.js Dark Theme
+//
+// ── Semantic color palette ───────────────────────────────────────────────────
+// These SCSS variables are the SINGLE SOURCE OF TRUTH for all colors in this
+// presentation, including Mermaid diagrams.
+//
+// Accent strokes (used in classDef stroke: and slide UI elements):
+//   $wb-blue   #4a90d9  = Automated / system stages
+//   $wb-purple #9b59b6  = AI-assisted stages
+//   $wb-gold   #e6a817  = Human checkpoint (the critical review stage)
+//   $wb-green  #27ae60  = Deterministic execution / outputs
+//   $wb-red    #e74c3c  = Warnings / out-of-scope
+//   $wb-muted  #8b949e  = Neutral / label / invisible arrow nodes
+//
+// Dark tint fills (used in classDef fill: — darkened versions of the accents):
+//   $wb-blue-tint   #1a3a5c  = stroke:#4a90d9 nodes
+//   $wb-purple-tint #2d1a4e  = stroke:#9b59b6 nodes
+//   $wb-gold-tint   #3d2800  = stroke:#e6a817 nodes
+//   $wb-green-tint  #0d3320  = stroke:#27ae60 nodes
+//   $wb-red-tint    #1c0808  = stroke:#e74c3c nodes
+//
+// ⚠ Mermaid classDef blocks cannot read SCSS or CSS variables — they require
+// literal hex values. If you change a color here, do a find-and-replace for
+// the old hex value in GMD_AI_Harmonization_Slides.qmd.
+// ────────────────────────────────────────────────────────────────────────────
+
+/*-- scss:defaults --*/
+
+// Base palette — GitHub dark dimmed
+$body-bg:    #0d1117 !default;
+$body-color: #e6edf3 !default;
+
+// Accent palette
+$wb-blue:   #4a90d9 !default;
+$wb-purple: #9b59b6 !default;
+$wb-gold:   #e6a817 !default;
+$wb-green:  #27ae60 !default;
+$wb-red:    #e74c3c !default;
+$wb-muted:  #8b949e !default;
+
+// Dark tint fills — backgrounds paired with each accent
+// (hex = canonical value; change here AND in classDef fill: in the .qmd)
+$wb-blue-tint:   #1a3a5c !default;
+$wb-purple-tint: #2d1a4e !default;
+$wb-gold-tint:   #3d2800 !default;
+$wb-green-tint:  #0d3320 !default;
+$wb-red-tint:    #1c0808 !default;
+
+// ── Mermaid theming (Quarto SCSS hooks) ──────────────────────────────────────
+// These map to CSS custom properties (--mermaid-*) that Quarto injects, and
+// govern the appearance of DEFAULT (unclassed) Mermaid nodes. Nodes that use
+// an explicit classDef ignore these and use hardcoded hex (see note above).
+$mermaid-bg-color:      $body-bg      !default;
+$mermaid-node-bg-color: $wb-blue-tint !default;
+$mermaid-node-fg-color: $body-color   !default;
+$mermaid-edge-color:    $wb-muted     !default;
+$mermaid-label-bg-color: $body-bg     !default;
+$mermaid-label-fg-color: $body-color  !default;
+$mermaid-font-family:   "Segoe UI", system-ui, -apple-system, "Liberation Sans", sans-serif !default;
+
+// Typography
+$font-family-sans-serif:    "Segoe UI", system-ui, -apple-system, "Liberation Sans", sans-serif !default;
+$presentation-heading-font: "Segoe UI", system-ui, -apple-system, "Liberation Sans", sans-serif !default;
+$presentation-heading-color: #f0f6fc !default;
+$presentation-heading-line-height: 1.2 !default;
+$code-color: #79c0ff !default;
+$link-color: #58a6ff !default;
+$selection-bg: #264f78 !default;
+
+/*-- scss:rules --*/
+
+// ── Base slide ──────────────────────────────────────────────────────────────
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section {
+  height: 100%;
+}
+
+.reveal {
+  font-size: 30px;
+}
+
+// ── Headings ─────────────────────────────────────────────────────────────────
+.reveal h1 {
+  font-size: 2.4em;
+  font-weight: 700;
+  text-transform: none;
+  color: #f0f6fc;
+  letter-spacing: -0.02em;
+}
+
+// First-level section divider slides (# headings)
+.reveal .slides section:has(> h1) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.reveal .slides section:has(> h1) > h1 {
+  font-size: 3.6em;
+  line-height: 0.95;
+  max-width: 12em;
+  margin: 0;
+}
+
+.reveal h2 {
+  font-size: 1.6em;
+  font-weight: 600;
+  text-transform: none;
+  color: #f0f6fc;
+  border-bottom: 3px solid $wb-blue;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.6em;
+}
+
+.slide-heading-morph {
+  font-size: 1.6em;
+  font-weight: 600;
+  color: #f0f6fc;
+  border-bottom: 3px solid $wb-blue;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.6em;
+}
+
+// suppress blue border on title slide (no real H2 content there)
+.reveal .title-slide h2 {
+  display: none;
+}
+
+.reveal h3 {
+  font-size: 1.2em;
+  font-weight: 600;
+  text-transform: none;
+  color: $wb-muted;
+  margin-top: 0.4em;
+}
+
+// ── Section title slides (# headings → full-bleed dark) ─────────────────────
+.reveal .slide-background-content {
+  background-size: cover;
+}
+
+// Section divider style
+.reveal section[data-background-color] h1,
+.reveal section[data-background-color] h2 {
+  color: #f0f6fc;
+  border-bottom: none;
+}
+
+// ── Blockquotes — used for key takeaways ────────────────────────────────────
+.reveal blockquote {
+  background: #161b22;
+  border: none;
+  border-left: 5px solid $wb-gold;
+  border-radius: 0 8px 8px 0;
+  padding: 0.75em 1.2em;
+  font-style: normal;
+  font-size: 0.88em;
+  font-weight: 500;
+  color: #f0f6fc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  width: 90%;
+  margin: 0.6em auto;
+}
+
+// ── Callout boxes ────────────────────────────────────────────────────────────
+.reveal .callout {
+  font-size: 0.82em;
+  border-radius: 8px;
+  margin: 0.4em 0;
+}
+
+.reveal .callout-note {
+  background: #161b22;
+  border-color: $wb-blue;
+}
+
+.reveal .callout-warning {
+  background: #1c1405;
+  border-color: $wb-gold;
+}
+
+.reveal .callout-important {
+  background: #1c0505;
+  border-color: $wb-red;
+}
+
+.reveal .callout-tip {
+  background: #091c12;
+  border-color: $wb-green;
+}
+
+// ── Columns utility ──────────────────────────────────────────────────────────
+.reveal .columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5em;
+}
+
+// ── Card grid for "What This System Is NOT" ────────────────────────────────
+.reveal .not-system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1em 1.15em;
+  margin-top: 0.8em;
+  align-items: stretch;
+}
+
+.reveal .not-system-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 7.25em;
+  padding: 0.9em 1em;
+  border-radius: 14px;
+  border: 1px solid rgba(231, 76, 60, 0.35);
+  border-left: 5px solid $wb-red;
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.96) 0%, rgba(13, 17, 23, 0.98) 100%);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.reveal .not-system-card p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.reveal .not-system-card-title {
+  display: block;
+  margin-bottom: 0.45em;
+  color: #ffb3aa;
+  font-weight: 700;
+  font-size: 0.95em;
+}
+
+// ── Card grid for "The Problem" ────────────────────────────────────────────
+.reveal .problem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9em 1.1em;
+  margin-top: 0.6em;
+}
+
+.reveal .problem-card {
+  padding: 1.0em 1.15em;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 5px solid $wb-blue;
+  background: linear-gradient(135deg, rgba(22, 27, 34, 0.96) 0%, rgba(13, 17, 23, 0.98) 100%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.30);
+}
+
+.reveal .problem-card p {
+  margin: 0;
+  font-size: 0.83em;
+  color: rgba(230, 237, 243, 0.78);
+  line-height: 1.45;
+}
+
+.reveal .problem-title {
+  display: block;
+  font-weight: 700;
+  font-size: 1.0em;
+  margin-bottom: 0.4em;
+}
+
+.reveal .problem-card.p-amber { border-left-color: #ffd166; }
+.reveal .problem-card.p-amber .problem-title { color: #ffd166; }
+.reveal .problem-card.p-red   { border-left-color: #ff7b72; }
+.reveal .problem-card.p-red   .problem-title { color: #ff7b72; }
+.reveal .problem-card.p-blue  { border-left-color: #79c0ff; }
+.reveal .problem-card.p-blue  .problem-title { color: #79c0ff; }
+.reveal .problem-card.p-purple { border-left-color: #d2a8ff; }
+.reveal .problem-card.p-purple .problem-title { color: #d2a8ff; }
+
+// ── Slide number ─────────────────────────────────────────────────────────────
+.reveal .slide-number {
+  background: transparent;
+  color: $wb-muted;
+  font-size: 0.65em;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+// ── Progress bar ─────────────────────────────────────────────────────────────
+.reveal .progress {
+  color: $wb-blue;
+  height: 3px;
+}
+
+// ── Code blocks ──────────────────────────────────────────────────────────────
+.reveal pre {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.reveal code {
+  background: #161b22;
+  color: $code-color;
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+  font-size: 0.85em;
+}
+
+.reveal .gmd-spec-slide .code-with-filename {
+  margin-top: 0.15em;
+}
+
+.reveal .gmd-spec-slide .code-with-filename-file pre {
+  margin: 0 0 0.45em;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 0.58em;
+  color: $wb-muted;
+}
+
+.reveal .gmd-spec-slide .code-copy-outer-scaffold,
+.reveal .gmd-spec-slide .sourceCode {
+  margin: 0;
+}
+
+.reveal pre.gmd-spec-embed {
+  max-height: 585px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 1em 1.1em;
+  border: 1px solid rgba($wb-gold, 0.35);
+  border-left: 5px solid $wb-gold;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.98) 0%, rgba(13, 17, 23, 0.99) 100%);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+  font-size: 0.47em;
+  line-height: 1.28;
+}
+
+.reveal pre.gmd-spec-embed.numberSource {
+  margin-left: 0;
+  padding-left: 4.2em;
+}
+
+.reveal pre.gmd-spec-embed.numberSource code > span > a:first-child::before {
+  color: rgba($wb-muted, 0.72);
+  border-right: 1px solid rgba($wb-muted, 0.18);
+}
+
+.reveal pre.gmd-spec-embed code {
+  display: block;
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+  color: #d0d7de;
+  white-space: pre;
+}
+
+.reveal pre.gmd-spec-embed::-webkit-scrollbar {
+  width: 10px;
+}
+
+.reveal pre.gmd-spec-embed::-webkit-scrollbar-track {
+  background: rgba(13, 17, 23, 0.8);
+  border-radius: 8px;
+}
+
+.reveal pre.gmd-spec-embed::-webkit-scrollbar-thumb {
+  background: rgba($wb-gold, 0.65);
+  border-radius: 8px;
+}
+
+// ── Tables ───────────────────────────────────────────────────────────────────
+.reveal table {
+  border-collapse: collapse;
+  font-size: 0.8em;
+  width: 100%;
+}
+
+.reveal table th {
+  background: #161b22;
+  color: $wb-blue;
+  border-bottom: 2px solid #30363d;
+  padding: 0.4em 0.7em;
+  text-align: left;
+  font-weight: 600;
+}
+
+.reveal table td {
+  border-bottom: 1px solid #21262d;
+  padding: 0.35em 0.7em;
+  vertical-align: top;
+}
+
+.reveal table tr:last-child td {
+  border-bottom: none;
+}
+
+.reveal table tr:hover td {
+  background: #161b22;
+}
+
+// ── Step cards for Stages 4–7 slides ────────────────────────────────────────
+.reveal .step-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5em 1.6em;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 5px solid $wb-green;
+  background: linear-gradient(160deg, rgba(22, 27, 34, 0.97) 0%, rgba(13, 17, 23, 0.99) 100%);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  height: 100%;
+}
+
+.reveal .step-card p,
+.reveal .step-card li {
+  font-size: 0.87em;
+  line-height: 1.55;
+  color: rgba(230, 237, 243, 0.82);
+}
+
+.reveal .step-card ul {
+  margin-top: 0.4em;
+  padding-left: 1.2em;
+}
+
+.reveal .step-card h3 {
+  margin-top: 0.1em;
+  margin-bottom: 0.5em;
+  font-size: 1.1em;
+  color: #f0f6fc;
+}
+
+.reveal .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  font-size: 1.25em;
+  font-weight: 800;
+  margin-bottom: 0.55em;
+  background: rgba($wb-green, 0.15);
+  border: 2px solid $wb-green;
+  color: $wb-green;
+  line-height: 1;
+}
+
+.reveal .step-card.step-green { border-top-color: $wb-green; }
+.reveal .step-card.step-green .step-num {
+  background: rgba($wb-green, 0.15);
+  border-color: $wb-green;
+  color: $wb-green;
+}
+
+.reveal .step-card.step-blue { border-top-color: $wb-blue; }
+.reveal .step-card.step-blue .step-num {
+  background: rgba($wb-blue, 0.15);
+  border-color: $wb-blue;
+  color: $wb-blue;
+}
+
+.reveal .step-card.step-gold { border-top-color: $wb-gold; }
+.reveal .step-card.step-gold .step-num {
+  background: rgba($wb-gold, 0.15);
+  border-color: $wb-gold;
+  color: $wb-gold;
+}
+
+.reveal .step-card.step-purple { border-top-color: $wb-purple; }
+.reveal .step-card.step-purple .step-num {
+  background: rgba($wb-purple, 0.15);
+  border-color: $wb-purple;
+  color: $wb-purple;
+}
+
+// ── Appendix navigation links ───────────────────────────────────────────────
+.reveal .appendix-jump,
+.reveal .appendix-nav {
+  margin-top: 0.9em;
+  font-size: 0.72em;
+  color: $wb-muted;
+}
+
+.reveal .appendix-jump a,
+.reveal .appendix-nav a {
+  color: #9ecbff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(158, 203, 255, 0.35);
+}
+
+.reveal .appendix-jump a:hover,
+.reveal .appendix-nav a:hover {
+  color: #d2e9ff;
+  border-bottom-color: rgba(210, 233, 255, 0.7);
+}
+
+// ── Fragment highlights ──────────────────────────────────────────────────────
+.reveal .fragment.highlight-blue.visible { color: $wb-blue; }
+.reveal .fragment.highlight-current-blue.current-fragment { color: $wb-blue; }
+
+// ── Mermaid diagram sizing ───────────────────────────────────────────────────
+// Ensure diagrams expand to fill available space
+.reveal .mermaid {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.reveal .mermaid svg {
+  max-width: 100% !important;
+  // Do NOT set height: auto here — it overrides the SVG height attribute and
+  // makes %%| fig-height have no effect. Height is controlled per-diagram
+  // via fig-height chunk options or the containing div's CSS.
+}
+
+// ── Icon badges (used in "What System Is NOT" slide) ─────────────────────────
+.badge {
+  display: inline-block;
+  padding: 0.15em 0.55em;
+  border-radius: 20px;
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-blue   { background: rgba($wb-blue,   0.2); color: $wb-blue;   border: 1px solid $wb-blue;   }
+.badge-purple { background: rgba($wb-purple, 0.2); color: $wb-purple; border: 1px solid $wb-purple; }
+.badge-gold   { background: rgba($wb-gold,   0.2); color: $wb-gold;   border: 1px solid $wb-gold;   }
+.badge-green  { background: rgba($wb-green,  0.2); color: $wb-green;  border: 1px solid $wb-green;  }
+.badge-red    { background: rgba($wb-red,    0.2); color: $wb-red;    border: 1px solid $wb-red;    }
+
+// ── Title slide special treatment ────────────────────────────────────────────
+.reveal .title-slide h1 {
+  font-size: 2.6em;
+  font-weight: 800;
+  border-bottom: none;
+  background: linear-gradient(135deg, #f0f6fc 0%, $wb-blue 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.reveal .title-slide .subtitle {
+  color: $wb-muted;
+  font-size: 1em;
+  font-weight: 400;
+  margin-top: 0.3em;
+}
+
+// ── Centered content helper ──────────────────────────────────────────────────
+.center-xy {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+// ── Accent rule line ─────────────────────────────────────────────────────────
+.accent-rule {
+  width: 60px;
+  height: 4px;
+  background: $wb-gold;
+  border-radius: 2px;
+  margin: 0.5em 0 1em 0;
+}
+
+// ── Phase/stage color pills (used in pipeline slides) ───────────────────────
+.stage-auto   { color: $wb-blue;   font-weight: 600; }
+.stage-ai     { color: $wb-purple; font-weight: 600; }
+.stage-human  { color: $wb-gold;   font-weight: 600; }
+.stage-engine { color: $wb-green;  font-weight: 600; }
+
+// ── Generic color aliases (use when stage semantics don't apply) ─────────────
+.color-blue   { color: $wb-blue;   font-weight: 600; }
+.color-purple { color: $wb-purple; font-weight: 600; }
+.color-gold   { color: $wb-gold;   font-weight: 600; }
+.color-green  { color: $wb-green;  font-weight: 600; }

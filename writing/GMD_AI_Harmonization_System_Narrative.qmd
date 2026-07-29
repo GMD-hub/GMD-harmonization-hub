@@ -1,0 +1,640 @@
+---
+title: "How the GMD AI-Assisted Harmonization System Works"
+subtitle: "A Process Narrative for the Global Monitoring Database"
+author: "GMD Harmonization Team"
+date: "May 2026"
+date-format: "MMMM YYYY"
+
+abstract: |
+  This document explains, from beginning to end, how the AI-assisted harmonization
+  pipeline for the Global Monitoring Database (GMD) works. It is written as a
+  process narrative, following the journey of a survey through the system from
+  arrival to final output, and is intended for anyone who needs to understand the
+  system: team members who will operate it, technical staff who will build it, and
+  stakeholders who need to evaluate it. Technical terms are introduced and explained
+  as they appear.
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    number-sections: true
+    theme: cosmo
+  pdf:
+    toc: true
+    number-sections: true
+    documentclass: article
+    geometry: [top=1in, bottom=1in, left=1.1in, right=1.1in]
+    fontsize: 11pt
+    colorlinks: true
+    linkcolor: wblinkcolor
+    urlcolor: wburlcolor
+    include-in-header:
+      text: |
+        \usepackage{xcolor}
+        \definecolor{wblinkcolor}{HTML}{003366}
+        \definecolor{wburlcolor}{HTML}{0071BC}
+        \usepackage{fancyhdr}
+        \pagestyle{fancy}
+        \fancyhf{}
+        \fancyhead[L]{\small GMD AI-Assisted Harmonization — Process Narrative}
+        \fancyhead[R]{\small DRAFT v1.0 | World Bank Group}
+        \fancyfoot[C]{\thepage}
+  docx:
+    toc: true
+    number-sections: true
+    reference-doc: ../assets/reference.docx
+
+execute:
+  echo: false
+  warning: false
+---
+
+# The Problem This System Is Solving
+
+Every year, the Global Monitoring Database (GMD) team at the World Bank ingests
+hundreds of household survey datasets from countries around the world. Each survey
+is different. Different countries use different questionnaires, different variable
+names, different coding schemes, and different ways of categorizing the same
+underlying concepts. Consider something as simple as gender. One survey codes it as 1 and 2, with labels
+in Portuguese. Another uses the strings "M" and "F". A third records it as 0 and 1
+with no labels or documentation at all. Each dataset is capturing exactly the same
+underlying concept; none of them looks the same to a computer, or to an analyst trying
+to combine them. Now extend that challenge to education levels, employment status,
+household relationships, urban or rural location, and dozens of other variables, across
+surveys from scores of countries conducted over decades. Before any of this data can be used for
+international comparisons of poverty, welfare, or living standards, it must be
+*harmonized*, meaning converted into a single, standardized format that allows meaningful
+comparison across countries and years.
+
+Harmonization is expert work. It requires an analyst to read the survey documentation,
+understand what each variable in the raw data actually measures, and then write a
+transformation script (typically in the statistical programming language Stata) that
+converts each raw variable into its GMD equivalent. For a single survey, this process
+can take days. For a database that handles hundreds of surveys per year, the cumulative
+burden is enormous.
+
+The challenge is compounded by the fact that harmonization decisions are often not
+formally documented. They live in scripts, in email threads, in the memory of
+individual team members. When a team member leaves, or when a survey needs to be
+re-harmonized years later, the reasoning behind past decisions is difficult to recover.
+Errors are hard to audit. Inconsistencies across surveys are hard to detect.
+
+The AI-assisted harmonization system is built to address exactly this.
+
+---
+
+# What the System Does, and What It Does Not Do
+
+Before describing how the system works, it is important to be clear about what it
+does and does not do.
+
+The system **does** read survey documentation and raw data, reason about how each
+raw variable maps to the GMD standard, and produce a structured draft of the
+harmonization decisions. It draws on past decisions to inform its reasoning. It checks
+its own work against formal rules before presenting it for review.
+
+The system **does not** make final decisions. Every mapping it proposes must be
+reviewed, approved, and signed off by a human expert before it is ever executed.
+The system is designed to accelerate and standardize the *first draft*, not to replace
+judgment. The human reviewer remains the methodological authority.
+
+This distinction runs through every design choice in the system, from how the AI is instructed to how its outputs are stored.
+
+::: {.callout-note appearance="simple"}
+**Harmonization Specification**
+
+The central artifact of this system is a document called the Harmonization
+Specification. It is a structured, machine-readable file (formatted as JSON, a
+standard data exchange format) that records, for every variable in a survey, exactly
+what transformation is proposed: which GMD variable it maps to, what recoding is
+needed, what confidence level the AI assigned, and what reasoning was used. This
+document is what the human reviews and approves. Nothing is executed without an
+approved Specification.
+:::
+
+The current phase of development focuses on a proof of concept scoped to non-welfare
+demographic variables: gender, age, education, urban and rural classification,
+household relationships, and labor force status, across approximately 100 to 200 new
+surveys per year. This scope is deliberate. These variables are complex enough to
+stress-test the methodology and bounded enough to allow careful evaluation before
+extending the system to more sensitive variables such as welfare aggregates
+(consumption and income estimates), where methodological errors carry greater
+consequences.
+
+---
+
+# The Full Pipeline at a Glance
+
+The diagram below shows the complete process. Each stage is described in detail in the
+sections that follow.
+
+```{mermaid}
+%%| label: fig-pipeline
+%%| fig-cap: "The GMD AI-assisted harmonization pipeline"
+
+flowchart LR
+    classDef db     fill:#0d2137,stroke:#4a90d9,color:#b8d4ee
+    classDef auto   fill:#1a3a5c,stroke:#4a90d9,color:#e6edf3
+    classDef ai     fill:#2d1a4e,stroke:#9b59b6,color:#e6edf3
+    classDef human  fill:#3d2800,stroke:#e6a817,color:#e6edf3
+    classDef engine fill:#0d3320,stroke:#27ae60,color:#e6edf3
+
+    subgraph SRC["Permanent input sources"]
+        direction TB
+        RAW[("Raw microdata\nStata · CSV")]
+        DOC[("Survey documentation\nPDF · Excel · codebooks")]
+        HIST[("Historical decisions\ndo2screen → historical DB")]
+        GMDS[("GMD schema\n& guidelines")]
+    end
+
+    subgraph PREP["Pre-processing: convert everything to structured schemas"]
+        direction TB
+        PROF["Data profiling\n🔍 Automated\ntypes · stats · missings\ncategories · labels"]
+        PARSE["Documentation parsing\n🤖 AI-assisted\nquestion text · codes\nskip patterns · structure"]
+    end
+
+    AI["② AI Drafting\n🤖 RAG + LLM\nagent sandbox loop"]
+    REV["③ Human Review\n👤 Approve / reject\n/ annotate"]
+    EXEC["④ Execution\n⚙️ Deterministic\nengine"]
+    QA["⑤ QA\n✅ Automated\nvalidation"]
+    OUT["⑥ Outputs\n📦 GMD data\n+ audit trail"]
+
+    RAW --> PROF
+    DOC --> PARSE
+    PROF -->|"Data profile schema"| AI
+    PARSE -->|"Documentation schema"| AI
+    PARSE -.->|"No DDI? Store\nas synthetic DDI"| DOC
+    HIST --> AI
+    GMDS --> AI
+    AI -.->|"Internal loop:\nrefine until\nown tests pass"| AI
+    AI -->|"Draft ready"| REV
+    REV -->|"Approved"| EXEC
+    REV -->|"Rejected + feedback"| AI
+    EXEC --> QA
+    QA -->|"Pass"| OUT
+    QA -->|"Fail"| REV
+    OUT -.->|"Save-back:\nnew precedent"| HIST
+
+    class RAW,DOC,HIST,GMDS db
+    class PROF auto
+    class PARSE,AI ai
+    class REV human
+    class EXEC,QA,OUT engine
+```
+
+---
+
+# The Four Permanent Input Sources
+
+The system draws on four sources of information that are always present, regardless
+of which survey is being harmonized. Three of them grow richer over time as the system
+learns.
+
+## Raw microdata
+
+This is the actual survey dataset, the file that contains one row per household or
+individual, with columns for each variable. It typically arrives as a Stata `.dta`
+file, though CSV and other formats are also supported. The raw microdata is the ground
+truth of what was actually recorded in the survey.
+
+The raw microdata is stored securely in a centralized file storage system (Azure Blob
+Storage) where all pipeline components can access it. Crucially, the raw microdata is
+never sent to the AI system directly. Instead, it is first processed into a structured
+summary (described in the next section), and only that summary reaches the AI.
+
+## Survey documentation
+
+This includes any documentation that came with the survey: questionnaire PDFs,
+codebooks in Excel or Word format, interviewer manuals, variable lists, or any other
+reference material that explains what the survey variables mean. In the ideal case,
+this also includes a **DDI file**.
+
+::: {.callout-note appearance="simple"}
+**DDI: Data Documentation Initiative**
+
+A DDI file is a structured, machine-readable XML file that contains standardized
+metadata about a survey: variable names, question text, response categories, universe
+descriptions (who was asked each question), and survey methodology notes. It is the
+international standard for documenting household survey data. Many surveys archived
+in the World Bank's Microdata Library have DDI files available via a public API.
+Where a DDI exists, it is the richest and most reliable source of documentation for
+the system.
+:::
+
+Not all surveys have DDI files. Many arrive with only a PDF questionnaire or an
+unstructured codebook. This is precisely why the documentation parsing stage (described
+below) exists: to extract and structure whatever documentation is available into a
+consistent format the AI can use.
+
+## Historical decisions database
+
+This is the system's institutional memory. It contains structured records of every
+harmonization decision that has ever been made and approved within the system:
+which raw variable was mapped to which GMD variable, what transformation was applied,
+what situation was declared (direct mapping, inferred mapping, not mappable), and any
+notes the reviewer added.
+
+Over time, this database tends to become the most valuable input source of all. It encodes
+decades of expert judgment in a form the AI can search and reason with. The database
+is initially seeded from legacy Stata harmonization scripts using a purpose-built tool
+called **do2screen**, described in the next section.
+
+::: {.callout-note appearance="simple"}
+**do2screen**
+
+`do2screen` is a Stata `ado` program developed by the GMD team that reads a Stata
+harmonization script (a `.do` file) and extracts, in structured form, the
+transformation decisions it encodes: which variables were recoded, how, and from
+what source. This makes it possible to convert years of existing harmonization work
+into structured records that can populate the historical decisions database, without
+having to re-document everything manually.
+:::
+
+One practical implication of this design is worth noting upfront: in the system's
+early life, the quality of its AI drafts depends directly on how thoroughly the
+historical database has been seeded. An empty or sparse precedent base gives the AI
+little to draw on. This is why converting legacy harmonization scripts via do2screen
+is not a one-time setup task but a foundational investment in the system's early
+performance, and why it happens before the pipeline begins processing new surveys.
+
+The historical database uses a technology called a **vector database**, which allows
+the AI to retrieve relevant past decisions through similarity search rather than exact
+matching. When the AI is reasoning about an education variable with an unusual coding
+scheme, it can ask the database: *"Find me past decisions about education variables
+from surveys with similar characteristics"* and retrieve the closest matches,
+even if no exact precedent exists.
+
+## GMD schema and guidelines
+
+This is the authoritative definition of every GMD target variable: its name, label,
+valid values, data type, and derivation rules. It is stored in a structured relational
+database and is the final authority in all cases of conflict. If a historical precedent
+suggests something that contradicts the GMD schema, the schema always wins. The
+schema database is what ensures that no matter how many different surveys the system
+processes, all outputs conform to the same standard.
+
+---
+
+# Stage One: Pre-Processing, Converting Everything to Structured Schemas
+
+The fundamental principle underlying the entire system is this: **no downstream stage
+should ever receive unstructured input.** The AI drafting stage should not try to read
+a raw PDF. It should not try to interpret a Stata binary file. It should receive only
+clean, consistently structured data that has already been organized into
+a well-defined template. The job of the pre-processing stage is to make this happen.
+
+Pre-processing has two parallel tracks that run simultaneously.
+
+## The data profiling track
+
+The data profiling step reads the raw microdata file and computes a comprehensive
+structured summary of what it contains. This step is entirely automated. No AI is involved.
+It is, in essence, a sophisticated version of what a data analyst would do when first
+exploring a new dataset: running `codebook` in Stata, or `str()` and `summary()` in R.
+
+The output is a **data profile schema**, a structured JSON document that contains,
+for every variable in the dataset:
+
+- The variable name and any embedded label
+- The data type and storage class (numeric, string, byte, integer, float, and so on)
+- Summary statistics for numeric variables (mean, standard deviation, minimum,
+  maximum, percentiles)
+- The count of missing values and the missing rate
+- For categorical or string variables: the number of distinct values and a frequency
+  table of the most common values
+- The total number of observations in the dataset
+
+This profile tells the AI what the data actually looks like in practice. The picture
+it provides can differ significantly from what the documentation says. A codebook might list
+a variable as having five response categories; the actual data might contain three,
+or seven, or include unexpected codes that indicate data quality issues. The profile
+captures reality.
+
+## The documentation parsing track
+
+Simultaneously, the documentation parsing step processes any available survey
+documentation. Unlike data profiling, this step is AI-assisted: it uses a language
+model to read unstructured documents and extract their content into a structured format.
+
+The reason AI is needed here is that survey documentation varies enormously. One
+survey's codebook is a tidy Excel table. Another's is a scanned PDF of a paper
+questionnaire from 1998. A third is a Word document with inconsistent formatting and
+embedded footnotes. A purely mechanical parser would fail on many of these. A language
+model can read them all and extract the same kinds of information regardless of format.
+
+The output is a **documentation schema**, another structured JSON document that
+captures, for every variable mentioned in the documentation:
+
+- The question text as it was asked
+- The list of response categories and their numeric codes
+- The universe: who was asked this question (all adults, only employed individuals,
+  households with children, and so on)
+- Any notes or caveats from the questionnaire
+- The section of the questionnaire where the variable appears
+
+When a DDI file is available, the documentation parsing step reads it directly.
+DDI files are already structured and can be parsed more reliably. When no DDI exists,
+the AI extracts what it can from whatever documentation is available.
+
+::: {.callout-important appearance="simple"}
+**A valuable byproduct: synthetic DDI creation**
+
+When a survey has no DDI file, the documentation schema produced by the parsing step
+is rich enough to serve as one. The system stores it back into the documentation
+database, effectively creating a synthetic DDI for the survey. Over time, this means
+the system is not only harmonizing surveys but also building out documentation
+coverage for surveys that were previously underdocumented. For the GMD team, which
+intends to create DDIs for new harmonized surveys, this is the natural mechanism for
+doing so.
+:::
+
+---
+
+# Stage Two: AI Drafting, Reasoning Toward a Harmonization Specification
+
+Once both pre-processing tracks are complete, the AI drafting stage begins. This is
+where the intelligence of the system is concentrated.
+
+The AI receives four inputs simultaneously:
+
+1. The **data profile schema**: what the raw data actually contains
+2. The **documentation schema**: what the survey documentation says the variables mean
+3. **Relevant historical decisions**: retrieved from the historical database by
+   searching for past decisions about similar variables and similar surveys
+4. The **GMD schema**: the authoritative definitions of all target variables
+
+Working with these four inputs, the AI reasons about each variable in the survey and
+proposes a mapping to the GMD standard. For each variable, it must answer a set of
+questions: Does this variable correspond to a GMD target variable? If so, which one?
+Is the mapping direct (the values need no transformation) or does it require recoding?
+Are there any complications a human reviewer should know about, such as unexpected
+values, missing documentation, or ambiguous categories?
+
+For each variable, the AI assigns one of three mapping situations. **Situation A** is
+a direct mapping: the raw variable corresponds cleanly to a GMD target variable and
+its values require little or no transformation. **Situation B** is an inferred mapping:
+the underlying concept is present in the survey but requires a country-specific
+conversion rule, for example, translating a national degree classification into
+standardized years of schooling, or recoding a local employment category into the GMD
+labor force scheme. **Situation C** means the variable cannot be reliably mapped; it
+is flagged as not mappable and will be set to missing in the output, with the reason
+documented. This three-way classification is recorded in the Harmonization
+Specification for every variable in the survey.
+
+::: {.callout-note appearance="simple"}
+**RAG: Retrieval-Augmented Generation**
+
+RAG is the technical term for the mechanism by which the AI searches the historical
+database before generating its proposals. Rather than relying purely on its general
+training, the AI first *retrieves* the most relevant past decisions from the historical
+database and then uses those as context when *generating* its draft. This is what
+allows the system to reflect the GMD team's specific institutional conventions and
+past choices, not just general statistical knowledge.
+:::
+
+The AI does not simply produce one draft and stop. It operates in an internal
+**sandbox loop**: it generates a draft specification, runs internal consistency checks
+against the GMD schema, identifies any contradictions or obvious errors, revises its
+proposals, and repeats until its own tests pass. Only then does it present the draft
+to the human reviewer. This means the reviewer receives a draft that has already
+passed a first round of automated quality checks, not a raw, unvetted output.
+
+The result of this stage is the **Harmonization Specification**: a structured JSON
+document listing every variable-level mapping decision, the AI's confidence level, its
+reasoning, and the historical precedents it drew on. This document is saved to
+centralized storage where the Review Application can read it.
+
+---
+
+# Stage Three: Human Review, Where Judgment Is Applied
+
+The Harmonization Specification is a machine-generated proposal. Nothing in it has
+authority until a human expert reviews and approves it. This is not a formality; it
+is the methodological core of the system.
+
+When a new draft Specification is saved to storage, the reviewer is automatically
+notified and opens it in the **Review Application**: a purpose-built web interface
+that presents the draft in a readable, interactive format. The reviewer sees, for each
+variable, the source variable and its documentation, the proposed GMD target, the
+AI's reasoning, and the historical precedents cited. They can approve the mapping as
+proposed, reject it and send it back to the AI with written feedback, or annotate it
+with caveats and corrections before approving.
+
+The Review Application reads from and writes back to the same centralized storage that
+the rest of the pipeline uses. It is the only point in the system where a human
+directly interacts with the pipeline's state.
+
+::: {.callout-warning appearance="simple"}
+**The rejection loop**
+
+When a reviewer rejects a mapping, the rejection is not simply discarded. It is sent
+back to the AI drafting stage as structured feedback: what was wrong, why it was
+rejected, and what the reviewer expects to see instead. The AI revises the relevant
+portions of the specification and resubmits for review. This loop can repeat as many
+times as necessary. Every revision and the reasons for it are logged in the audit
+trail.
+:::
+
+When the reviewer is satisfied with the full Specification and approves it, the
+approved version is saved back to storage. This triggers the next stage automatically.
+
+---
+
+# Stage Four: Execution, Turning Decisions into Data
+
+The execution stage takes the approved Harmonization Specification and implements it
+on the raw microdata. This stage is entirely **deterministic**: it involves no AI, no
+probabilistic reasoning, and no judgment. It is code that reads a specification and
+applies it precisely.
+
+::: {.callout-note appearance="simple"}
+**Deterministic code**
+
+Deterministic means that given the same inputs, the code always produces exactly the
+same output. There is no randomness, no model inference, no approximation. An approved
+Specification, applied to the same raw data file by the execution engine, will always
+produce the same harmonized dataset, whether on the first run, on the hundredth run, or
+five years from now. This reproducibility is essential for a system that feeds official
+statistics.
+:::
+
+The execution engine reads the approved Specification, loads the raw microdata, and
+applies each transformation in sequence: renaming variables, recoding values,
+computing derived variables from atomic inputs, and applying any filters or conditions
+specified. It does not interpret the Specification; it executes it exactly as written.
+
+This strict separation between the *decision* (made by the AI and approved by the
+human in the Specification) and the *execution* (performed mechanically by the engine)
+is one of the most important design choices in the system. It means that every
+harmonization output is fully explainable: anyone can look at the approved
+Specification and the execution log and understand exactly what happened and why,
+without having to reason about what an AI "might have been thinking."
+
+---
+
+# Stage Five: Quality Assurance, Automated Validation
+
+Before any output is considered final, it passes through an automated quality
+assurance stage. The QA engine compares the harmonized dataset against the GMD schema
+to verify that every output variable falls within its defined valid range, has the
+correct data type, meets completeness requirements, and is internally consistent with
+related variables.
+
+Examples of checks performed: Is the age variable non-negative and within a plausible
+range? Do the education category codes match the GMD enumeration exactly? Is the
+urban/rural indicator binary with no missing values above the acceptable threshold?
+Are household-level and individual-level variables consistent with each other?
+
+If all checks pass, the output moves to the final stage. If any check fails, the
+failed output is not stored as final; instead, it is flagged and sent back to the
+human review stage with a detailed report of which checks failed and why. The reviewer
+then determines whether the issue lies in the Specification (requiring a revision) or
+in the raw data (requiring a note in the output documentation).
+
+---
+
+# Stage Six: Outputs and the Learning Loop
+
+A harmonized survey that passes QA produces two categories of output.
+
+The first is the **harmonized GMD dataset** itself: a clean, standardized microdata
+file in which all variables conform to the GMD schema, ready for integration into the
+database. This file is accompanied by a complete **audit trail**, a permanent,
+immutable record of every decision made during the harmonization process. It captures what inputs
+were used, which version of the Specification was approved, who approved it and when,
+what the QA results were, and any revisions or annotations made during review.
+
+The audit trail means that the question *"How was this variable harmonized, and why?"*
+can always be answered precisely, not from memory, but from a permanent, queryable record.
+
+The second output is less visible but equally important: the **save-back to the
+historical decisions database**. Every approved harmonization decision (every
+variable mapping that passed review and QA) is stored back into the historical
+database as a new precedent. The next time the system encounters a similar survey, it
+will have this decision available as a reference.
+
+This is how the system improves over time. Early in its life, it draws on legacy Stata
+scripts converted via do2screen. As it processes more surveys, it accumulates a richer
+and richer base of vetted decisions. The quality of its drafts improves. The reviewer's
+workload decreases. The gap between what the AI proposes and what the human would have
+decided independently narrows.
+
+This learning loop is not automatic in the sense of unsupervised machine learning:
+no decision enters the historical database without human approval. Every precedent in
+the database has been validated by a domain expert. This is what makes the
+institutional memory trustworthy.
+
+---
+
+# The Infrastructure Underneath
+
+All of the above requires a set of cloud infrastructure components to function. These
+are described in detail in the accompanying *Infrastructure Requirements* document
+prepared for ITS. In summary, the system relies on seven components:
+
+| Component | What it does |
+|-----------|-------------|
+| **File storage** (Azure Blob Storage) | Holds all raw files, processed schemas, approved specifications, and outputs |
+| **Rules database** (Azure SQL) | Stores the canonical GMD schema, always the final authority |
+| **AI language model** (Azure OpenAI Service) | The engine behind documentation parsing and AI drafting |
+| **Historical decisions database** (Azure AI Search) | Stores and retrieves past harmonization decisions via similarity search |
+| **Compute environment** (Azure Kubernetes Service) | Runs all pipeline jobs on demand, with team-managed deployment |
+| **Audit trail and monitoring** (Azure Monitor) | Records every system action for accountability and debugging |
+| **Review Application** (Posit Connect or Azure-hosted) | The web interface through which human reviewers interact with the pipeline |
+
+: Infrastructure components {tbl-colwidths="[35,65]"}
+
+The most critical infrastructure question, and the one that must be resolved before
+any other design can be finalized, is whether **Azure OpenAI Service** is approved
+for use in the World Bank Group's Azure tenant. This is the enterprise version of the
+AI language model, designed to meet the data residency and security requirements of
+organizations like the World Bank. Without it, the documentation parsing and AI
+drafting stages cannot function as designed. All other questions are secondary to this
+one.
+
+---
+
+# The Role of Schemas: The Real Design Challenge
+
+It might be tempting to think of this as primarily an AI system, but that framing
+misses the point. It is, at its core, a **schema design system** in which AI plays a supporting role.
+
+Every stage of the pipeline is, at its core, a conversion from a less structured form
+to a more structured one:
+
+- Survey documentation (unstructured PDF) → Documentation schema (structured JSON)
+- Raw microdata (binary Stata file) → Data profile schema (structured JSON)
+- Both schemas, combined with rules and precedents → Harmonization Specification (structured JSON)
+- Approved Specification → Harmonized GMD data (structured dataset)
+
+The quality of the AI's output is directly proportional to the quality of the schemas
+it receives as input. A vague, inconsistently defined documentation schema produces
+vague AI proposals. A precisely defined schema, in which every field has a clear
+meaning and every value has a constrained range, produces consistent, auditable
+proposals.
+
+This means that before any code is written and before any AI is prompted, the team
+must carefully define:
+
+1. **The data profile schema**: exactly what fields the automated profiling step
+   produces for each variable
+2. **The documentation schema**: exactly what fields the documentation parsing step
+   extracts from questionnaires and codebooks
+3. **The Harmonization Specification format**: exactly what fields and values are
+   valid for each variable-level mapping decision
+
+These three schemas are the contracts between pipeline stages. Getting them right is
+the highest-leverage design work in the project.
+
+---
+
+# What This Means for the GMD Team in Practice
+
+For a harmonizer working with this system, the day-to-day experience changes in a
+specific and bounded way. The mechanical first-draft work (reading documentation,
+proposing mappings, and writing transformation logic) is handled by the system. The
+harmonizer's time is redirected toward the work that requires genuine judgment:
+reviewing proposals, catching edge cases the AI missed, annotating unusual situations,
+and making the final call on ambiguous mappings.
+
+The save-back loop means that every judgment a harmonizer makes is preserved
+permanently, attributed to them, and available to inform future work. Over time, the
+team builds not just a database of decisions but a structured record of *reasoning*:
+why a particular approach was chosen for a particular kind of survey, what the known
+complications are for specific country contexts, how the team has resolved recurring
+ambiguities in the past. This institutional knowledge, which today lives largely in
+individual memories and scattered scripts, becomes a shared, searchable, durable
+resource.
+
+For the proof of concept, the system covers the demographic variable categories
+described in Section 2. Welfare aggregates remain out of scope until the proof of
+concept demonstrates that the methodology is sound.
+
+---
+
+# Summary
+
+The GMD AI-assisted harmonization system is best understood not as an AI that
+harmonizes surveys, but as a structured pipeline that converts unstructured inputs
+into structured outputs at every stage, with human judgment applied at the decisive
+moment before any transformation is executed.
+
+A new survey arrives. Its raw data is profiled automatically. Its documentation is
+parsed by an AI agent into a structured schema. Both schemas, together with the GMD
+rules and years of historical decisions, are handed to an AI drafting agent that
+proposes a complete Harmonization Specification. That Specification is reviewed and
+approved by a human expert using a purpose-built review interface. Once approved, a
+deterministic execution engine applies the Specification to the raw data. Automated
+quality checks validate the output. The final harmonized dataset, complete with a full
+audit trail, is stored. And the approved decision is saved back into the historical
+database, making the system incrementally smarter for the next survey.
+
+The system does not remove expertise from harmonization. It amplifies it, by encoding
+past expertise into a form that can inform future work, and by redirecting current
+expertise toward the decisions that actually require it.
+
+---
+
+*GMD Harmonization Team · Development Data Group · World Bank Group · May 2026 · DRAFT v1.0*
