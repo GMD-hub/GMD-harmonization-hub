@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "compound-gpid-roadmap-v1",
+  "milestones": [
+    {
+      "id": "the-gmd-harmonization-hub-is",
+      "title": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
+      "objective": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline. It records how the canonical schema, the survey extraction pipeline, the historical precedent knowledge base, and the human review process fit together as a single system, and it explains the reasoning behind the major design decisions that shape that system. Its purpose is to let any team member, collaborator, or institutional partner understand the architecture of the pipeline and the responsibilities each repository and each person holds, without needing to reconstruct that understanding from scattered conversations, code, or memory. The hub contains no pipeline code of its own. Its role is to explain, connect, and preserve the reasoning behind the system, so the project stays legible as it grows and as team membership changes.",
+      "status": "in-progress",
+      "features": [
+        {
+          "id": "initial-focus",
+          "title": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
+          "status": "in-progress",
+          "plan": null
+        }
+      ]
+    }
+  ]
+}
