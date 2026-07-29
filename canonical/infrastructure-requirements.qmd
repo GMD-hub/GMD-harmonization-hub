@@ -1,0 +1,351 @@
+---
+title: "GMD AI-Assisted Harmonization System"
+subtitle: "Canonical Infrastructure Requirements and Decision Register"
+author: "GMD Harmonization Team"
+date: "2026-07-29"
+date-format: "MMMM D, YYYY"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    theme: cosmo
+execute:
+  echo: false
+  warning: true
+---
+
+::: {.callout-important}
+## Document authority
+
+This document defines required infrastructure capabilities and records the
+status of implementation options. It does not certify that a named service is
+available, approved, compliant, or correctly configured. Only an explicit
+decision by the authorized WBG and project owners changes a candidate service
+to `Approved`.
+:::
+
+# Purpose
+
+The AI-assisted harmonization system needs a controlled environment in which it
+can register survey sources, structure documentation, draft and review
+specifications, execute approved logic, validate outputs, and preserve a full
+audit trail.
+
+This document consolidates the earlier ITS requirements note, concise request,
+and round-one question list. It separates durable capabilities from provisional
+Azure product mappings so that an unapproved proposal cannot become architecture
+by repetition.
+
+# Status vocabulary
+
+| Status | Meaning |
+|---|---|
+| Required | Capability is necessary to satisfy the canonical architecture |
+| Proposed | Preferred option or design awaiting accountable approval |
+| Under review | Submitted to the relevant owner; response pending |
+| Approved | Explicitly accepted for a defined scope and configuration |
+| Rejected | Considered and not accepted, with rationale |
+| Open | Requirement or decision is not sufficiently defined |
+
+Product names in this document are `Proposed` unless a decision record states
+otherwise.
+
+# Capability requirements
+
+## Source and artifact storage
+
+The system requires durable storage for source files, structured extracts,
+specifications, logs, and outputs. It must support:
+
+- data classification and access separation by artifact class;
+- immutable identity through hashes and versioning;
+- prevention or detection of source overwrite;
+- encryption and institutionally approved key management;
+- private or otherwise approved network access;
+- backup, recovery, retention, legal hold, and deletion policies;
+- access logging suitable for restricted survey data; and
+- controlled access from compute, review, and audit services.
+
+Raw sources, mutable workflow state, and published outputs must not be conflated
+merely because one object store can hold all three.
+
+## Structured sources of truth
+
+The system needs transactional storage for canonical schema metadata, workflow
+state, approvals, run manifests, and related structured records. Requirements
+include:
+
+- schema constraints and referential integrity;
+- concurrency control and idempotent state transitions;
+- version history and auditable changes;
+- role-based read and write permissions; and
+- backup, restore, retention, and availability appropriate to each record type.
+
+The canonical GMD schema and historical precedents are logically separate even
+if an implementation shares infrastructure. Rules are authoritative; precedents
+are advisory.
+
+## Enterprise model inference
+
+The system requires an institutionally approved model endpoint for
+documentation extraction, drafting, and bounded diagnosis. Approval must define:
+
+- permitted data classifications and fields;
+- tenant, region, residency, retention, abuse-monitoring, and training-use terms;
+- private endpoint or approved network path;
+- identity and authorization model;
+- model and deployment version control;
+- quotas, rate limits, capacity, and cost controls;
+- prompt and response logging policy; and
+- an incident and service-degradation path.
+
+No raw respondent-level microdata may be sent to a model under the default
+architecture. Approval of a platform does not itself approve every payload.
+
+## Historical retrieval
+
+The system needs hybrid retrieval over quality-assured precedents and selected
+documentation. It must support:
+
+- structured filtering by survey, country, wave, module, variable, status, and
+  schema version;
+- keyword and, where justified, semantic similarity retrieval;
+- citations back to the complete source, approval, and QA lineage;
+- index and embedding versioning;
+- withdrawal or suppression of superseded precedents;
+- evaluation of retrieval relevance and access leakage; and
+- authorization filtering before retrieval results reach a model or user.
+
+A dedicated "vector database" is an implementation option, not a logical
+requirement. The requirement is governed, attributable retrieval.
+
+## Compute and orchestration
+
+The system needs isolated execution for event-driven and batch workloads:
+
+- deterministic profiling and document processing;
+- model-assisted drafting;
+- bounded, non-production sandbox runs;
+- production execution of approved specifications only;
+- quality assurance and publication tasks; and
+- scheduled precedent-index maintenance.
+
+The platform must provide workload identity, resource quotas, timeouts,
+concurrency limits, retry policy, idempotency, deployment versioning, and direct
+operational visibility for the authorized team. Compute selection must follow
+measured workload and control requirements; a container platform does not by
+itself guarantee low idle cost or scale-to-zero behavior.
+
+## Sandbox isolation
+
+The pre-approval sandbox is a separate trust zone. It requires:
+
+- separation from production authorization and credentials;
+- access only to an approved survey copy or scope;
+- bounded CPU, memory, time, iteration count, and cost;
+- restricted outbound connectivity;
+- an allowlist of executable operations and dependencies;
+- complete iteration and diagnostic logging; and
+- a field-level policy for diagnostics returned to the model.
+
+Sandbox success never creates production approval.
+
+## Human review and workflow control
+
+Review requires an authenticated interface that lets an authorized expert:
+
+- inspect source evidence, rules, precedents, uncertainty, and proposed logic;
+- approve, reject, or amend decisions with reasons;
+- see and compare versions;
+- sign an exact specification hash;
+- manage conflicts and stale reviews; and
+- submit decisions through validated state transitions.
+
+Immutable artifact storage is not sufficient as the workflow control plane.
+The implementation must handle concurrent reviews, locking or optimistic
+concurrency, duplicate events, idempotency, notification, and authorization.
+
+## Identity, secrets, and network
+
+The preferred control model is identity-based and least-privilege. The approved
+design must specify:
+
+- workload and human identities;
+- role definitions and segregation of duties;
+- managed identity or the approved equivalent;
+- secret storage, rotation, expiration, and audit;
+- private endpoints, firewall rules, DNS, and egress controls;
+- access paths for the Microdata Library and approved package sources; and
+- emergency access and revocation procedures.
+
+Long-lived credentials embedded in source code, images, prompts, or files are
+prohibited.
+
+## Observability and audit
+
+The system needs operational telemetry and a separate, durable audit record.
+Together they must cover:
+
+- correlation across intake, draft, review, execution, QA, and publication;
+- actor or workload identity and timestamps;
+- source, specification, schema, engine, model, and QA versions;
+- output hashes and disposition;
+- model call metadata consistent with data policy;
+- failed authorization and data-access events;
+- alerting, dashboards, and team read access; and
+- retention, tamper evidence, export, and investigation procedures.
+
+Application logs alone are not the approval ledger or execution manifest.
+
+## Delivery and software supply chain
+
+Implementation repositories require an approved delivery path with:
+
+- version control and protected branches;
+- automated tests and policy checks;
+- artifact and container registry;
+- dependency locking, vulnerability scanning, and provenance;
+- environment-specific deployment approvals;
+- rollback and withdrawal procedures; and
+- separation between development, sandbox, and production identities.
+
+## Notification
+
+Reviewers and operators need approved notifications for drafts, rejected or
+stale reviews, failed runs, QA disposition, and incidents. Notifications should
+contain identifiers and links, not restricted data or model payloads.
+
+# Environment model
+
+At minimum, the system needs the following separation:
+
+| Environment | Purpose | Data | Production authority |
+|---|---|---|---|
+| Development | Contract, code, and UI development | Synthetic or approved non-production data | None |
+| Sandbox | Bounded pre-approval execution and diagnosis | Approved limited survey scope | None |
+| Production | Authorized deterministic runs and QA | Approved operational data | Exact approved specifications only |
+
+Separation may use subscriptions, clusters, namespaces, accounts, or another
+approved mechanism, but identities, permissions, secrets, and audit records must
+make the boundary enforceable.
+
+# Data and model decision matrix
+
+| Payload | Default model status | Decision needed |
+|---|---|---|
+| Public or approved survey documentation | Open | Classification, endpoint, retention, logging |
+| Restricted questionnaires or codebooks | Open | Data-owner and platform approval |
+| DDI or extracted metadata | Open | Field classification and provenance policy |
+| Aggregated variable profile | Open | Allowed statistics, thresholds, suppression |
+| Row-level microdata | Prohibited | Architecture exception plus data-owner and security approval |
+| Sandbox diagnostics | Open | Allowlisted fields, redaction, retention |
+| Approved precedents | Open | Authorization filtering and model-use approval |
+| Prompts and model responses | Open | Storage, access, retention, incident handling |
+
+# Candidate service mapping
+
+The following mappings preserve what earlier drafts proposed without treating
+the proposals as approved facts.
+
+| Capability | Candidate options from archived drafts | Status | Required decision evidence |
+|---|---|---|---|
+| Object storage | Azure Blob Storage or ADLS Gen2 | Under review | Data classification, network, identity, retention, immutability |
+| Relational records | Azure SQL Database or PostgreSQL on Azure | Under review | Approved standard, ownership, availability, backup, access |
+| Model endpoint | Azure OpenAI Service or approved Azure AI/Foundry deployment | Under review | Tenant availability, region, payload policy, retention, quota |
+| Hybrid retrieval | Azure AI Search with vector capability or approved alternative | Under review | Access filtering, lineage, index lifecycle, evaluation |
+| Batch compute | AKS as an earlier target; simpler managed container or job service for PoC | Under review | Workload fit, isolation, access, operations, cost, migration |
+| Monitoring | Azure Monitor and Log Analytics or institutional standard | Under review | Onboarding, retention, audit separation, team access |
+| Review interface | Posit Connect application or Azure-hosted web application | Under review | Identity, hosting, storage access, workflow semantics, support |
+| Notification | Approved email, Teams, or event-driven service | Open | Trigger, content, authorization, support model |
+
+No service-specific security, residency, training-use, or cost claim is accepted
+without current documentation for the exact tenant, region, configuration, and
+contractual terms.
+
+# Responsibility model
+
+| ITS or platform authority | GMD project team | Joint decision |
+|---|---|---|
+| Approve and provision institutional platforms | Define methodology, contracts, prompts, and pipeline behavior | Data classification and model payload policy |
+| Configure baseline network, identity, security, backup, and monitoring controls | Build, test, deploy, and support project applications within granted access | Environment and segregation design |
+| Publish service constraints and operational support model | Review and approve harmonization specifications | Production access and release controls |
+| Maintain underlying managed services as agreed | Curate rules, precedents, QA policy, and project audit evidence | Incident response and retention |
+
+The exact responsibility assignment must be agreed service by service. Earlier
+drafts assumed broad ITS and GMD roles but did not establish an approved RACI.
+
+# Questions requiring authoritative answers
+
+The detailed round-one questionnaire remains in the archive. The canonical
+questions are:
+
+1. Which storage service and configuration are approved for each survey data
+   classification, and what immutability, retention, backup, and access logging
+   controls are mandatory?
+2. Can approved compute access the Microdata Library and package sources, and
+   through what egress or allowlist process?
+3. Which relational and workflow-state platforms are standard and available?
+4. Which enterprise model endpoints are approved, in which regions, and for
+   exactly which documentation, metadata, profile, diagnostic, and precedent
+   fields?
+5. What are the model endpoint's retention, monitoring, quota, and capacity
+   constraints for the approved configuration?
+6. Which retrieval service supports authorization-aware keyword and similarity
+   search with attributable results?
+7. Which compute platform best fits development, bounded sandbox, and production
+   batch workloads, and what self-service deployment and log access can the team
+   receive?
+8. How will workload identity, secret management, private connectivity, and
+   environment separation be implemented?
+9. What are the approved monitoring and audit services, retention periods, and
+   direct query rights for the project team?
+10. Where can the review application be hosted, how will users authenticate, and
+    which workflow-state service will prevent stale or duplicate approvals?
+11. Which notification mechanism is approved for review and operational events?
+12. Which CI/CD, registry, dependency, vulnerability, and release controls are
+    mandatory?
+13. Who owns service operation, application support, incident response, cost,
+    and approvals at each lifecycle stage?
+14. What is the smallest approved proof-of-concept configuration that does not
+    preclude a secure production design?
+
+# Decision gates
+
+## Before a proof of concept with institutional data
+
+- Data owner approves the survey sources and field-level model payload policy.
+- ITS or the platform authority approves the selected services and regions.
+- Development and sandbox isolation, identity, secrets, logging, and cost limits
+  are tested.
+- The specification, approval, execution, and QA contracts are versioned.
+- A human reviewer and incident owner are named.
+
+## Before production
+
+- The architecture threat model and privacy review are accepted.
+- Production authorization verifies exact approval and content hashes.
+- Backup, recovery, retention, withdrawal, and incident procedures are tested.
+- Retrieval and model behavior are evaluated on held-out surveys.
+- Monitoring, audit export, support, capacity, and cost controls are operational.
+- Repository and service ownership is documented.
+
+# Infrastructure decision register
+
+| ID | Decision | Status | Next evidence or owner action |
+|---|---|---|---|
+| I-001 | Use Azure object storage for restricted survey sources | Under review | Confirm approved service, classification, and configuration with ITS |
+| I-002 | Use a managed relational service for rules and workflow records | Under review | Select institutional standard and ownership model |
+| I-003 | Use an enterprise Azure model endpoint | Under review | Confirm tenant, region, payload classes, retention, and quota |
+| I-004 | Use Azure AI Search for hybrid precedent retrieval | Under review | Validate approval, authorization filters, lineage, and evaluation |
+| I-005 | Use AKS as the production compute target | Proposed | Compare workload, control, operations, cost, and migration needs |
+| I-006 | Use a simpler managed compute service for the PoC | Proposed | Identify an approved option that preserves contract portability |
+| I-007 | Host review in Posit Connect or an Azure web platform | Open | Decide identity, workflow state, support, and integration model |
+| I-008 | Separate development, sandbox, and production | Required | Agree enforceable implementation and access model |
+| I-009 | Do not send row-level microdata to the model by default | Required | Define field-level allowed payloads and exception authority |
+| I-010 | Use managed identity and centralized secret storage | Proposed | Confirm institutional pattern and service support |
+
+---
+
+*Canonical version 1.0. Consolidated from archived ITS materials on
+2026-07-29.*
