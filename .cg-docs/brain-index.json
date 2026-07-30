@@ -1,0 +1,119 @@
+{
+  "edge_count": 1,
+  "edges": [
+    {
+      "edge_type": "reviews",
+      "source": ".cg-docs/reviews/2026-07-29-incorporate-system-map-review.md",
+      "target": ".cg-docs/plans/2026-07-29-incorporate-system-map.md",
+      "target_missing": false
+    }
+  ],
+  "entities": [
+    {
+      "date": "2026-07-29",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-07-29-incorporate-system-map.md",
+      "slug": "2026-07-29-incorporate-system-map",
+      "status": "completed",
+      "summary": "Incorporate the supplied GMD system components map into the hub's supporting architecture documentation while keeping the repository's authority boundaries explicit. Separate reusable terminology and unresolved decisions into their established destinations, and update navigation and project deliverables to make the new map discoverable.",
+      "tags": [
+        "documentation",
+        "system-map",
+        "glossary",
+        "open-questions",
+        "navigation"
+      ],
+      "title": "Incorporate the system components map into the hub",
+      "top_keywords": [
+        "system_map.md",
+        "readme.md",
+        "compound-gpid.md",
+        "agents.md",
+        "open_questions.md",
+        "test scenarios",
+        "glossary_and_questions/glossary.md",
+        "glossary_and_questions/open_questions.md",
+        "git diff --check",
+        "map"
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "entity_type": "review",
+      "path": ".cg-docs/reviews/2026-07-29-incorporate-system-map-review.md",
+      "slug": "2026-07-29-incorporate-system-map-review",
+      "status": "",
+      "summary": "**Review mode**: light **Files reviewed**: 4 **Findings**: 2 (P0: 0, P1: 0, P2: 1, P3: 1)",
+      "tags": [],
+      "title": "2026-07-29-incorporate-system-map-review",
+      "top_keywords": [
+        "open_questions.md",
+        "readme.md",
+        "raw data cleaning",
+        "system_map.md",
+        "glossary.md",
+        "compound-gpid.md",
+        "review",
+        "fix",
+        "report",
+        "important"
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/testing-patterns/2026-07-29-documentation-smoke-checks-without-test-harness.md",
+      "slug": "2026-07-29-documentation-smoke-checks-without-test-harness",
+      "status": "",
+      "summary": "A documentation-only change added new navigation edges to `system_map.md`, `README.md`, and the glossary/open-questions split. Review found that the change had no explicit smoke-check convention for links or navigation behavior. The repository also had no `tests/` directory, so the standard targeted and full-suite `Run-Tests.ps1` workflow was unavailable.",
+      "tags": [
+        "documentation",
+        "smoke-checks",
+        "navigation",
+        "markdown-links",
+        "quarto",
+        "review"
+      ],
+      "title": "Documentation smoke checks when navigation changes have no test harness",
+      "top_keywords": [
+        "readme.md",
+        "system_map.md",
+        "navigation",
+        "documentation",
+        "run-tests.ps1",
+        "tests/",
+        "test",
+        "smoke",
+        "changes",
+        "harness"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#initial-focus",
+      "slug": "initial-focus",
+      "status": "in-progress",
+      "summary": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
+      "tags": [],
+      "title": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
+      "top_keywords": [
+        "harmonization hub",
+        "harmonization",
+        "pipeline",
+        "hub",
+        "survey",
+        "gmd",
+        "central",
+        "reference",
+        "point",
+        "assisted"
+      ]
+    }
+  ],
+  "entity_count": 4,
+  "generated": "2026-07-29",
+  "schema_version": "0.2.0",
+  "topic_count": 0,
+  "topics": []
+}
