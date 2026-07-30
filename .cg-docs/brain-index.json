@@ -1,10 +1,16 @@
 {
-  "edge_count": 1,
+  "edge_count": 2,
   "edges": [
     {
       "edge_type": "reviews",
       "source": ".cg-docs/reviews/2026-07-29-incorporate-system-map-review.md",
       "target": ".cg-docs/plans/2026-07-29-incorporate-system-map.md",
+      "target_missing": false
+    },
+    {
+      "edge_type": "verifies",
+      "source": ".cg-docs/reviews/2026-07-29-incorporate-system-map-verify-review.md",
+      "target": ".cg-docs/reviews/2026-07-29-incorporate-system-map-review.md",
       "target_missing": false
     }
   ],
@@ -38,6 +44,34 @@
       ]
     },
     {
+      "date": "2026-07-30",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-07-30-visual-architecture.md",
+      "slug": "2026-07-30-visual-architecture",
+      "status": "completed",
+      "summary": "Create three clear, consistent, and maintainable architecture diagrams that orient new collaborators to the harmonization schemas, satellite repository relationships, and architecture-decision coverage. Keep native Excalidraw files as the canonical editable sources, publish GitHub-viewable SVG exports, and derive every represented claim from current authoritative repository material.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "diagrams",
+        "excalidraw",
+        "svg"
+      ],
+      "title": "Create the Visual Architecture diagram set",
+      "top_keywords": [
+        "system_map.md",
+        "readme.md",
+        "diagrams/readme.md",
+        "diagrams/",
+        ".excalidraw",
+        "jq",
+        "xmllint",
+        "roadmap.json",
+        "@cg-roadmap",
+        "test scenarios"
+      ]
+    },
+    {
       "date": "2026-07-29",
       "entity_type": "review",
       "path": ".cg-docs/reviews/2026-07-29-incorporate-system-map-review.md",
@@ -56,6 +90,28 @@
         "review",
         "fix",
         "report",
+        "important"
+      ]
+    },
+    {
+      "date": "2026-07-30",
+      "entity_type": "review",
+      "path": ".cg-docs/reviews/2026-07-29-incorporate-system-map-verify-review.md",
+      "slug": "2026-07-29-incorporate-system-map-verify-review",
+      "status": "",
+      "summary": "**Review mode**: light **Files reviewed**: 12 **Findings**: 2 (P0: 0, P1: 0, P2: 1, P3: 1)",
+      "tags": [],
+      "title": "2026-07-29-incorporate-system-map-verify-review",
+      "top_keywords": [
+        "2026-07-30-visual-architecture.md",
+        "current.json",
+        "readme.md",
+        "roadmap.json",
+        "claim-source-matrix.md",
+        "report",
+        "fix",
+        "review",
+        "passed",
         "important"
       ]
     },
@@ -89,31 +145,447 @@
       ]
     },
     {
+      "date": "2026-07-30",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/testing-patterns/2026-07-30-markdown-links-in-doc-indexes-enable-smoke-checks.md",
+      "slug": "2026-07-30-markdown-links-in-doc-indexes-enable-smoke-checks",
+      "status": "",
+      "summary": "A documentation review flagged that a new index of diagram artifacts used plain text filenames and basis references instead of real markdown links. The repository already had a lightweight smoke-check convention for docs-only changes, but that convention could only validate concrete navigation anchors. Because the index exposed text rather than links, the new documentation surface was only partially testable.",
+      "tags": [
+        "documentation",
+        "markdown-links",
+        "smoke-checks",
+        "navigation",
+        "indexes",
+        "review"
+      ],
+      "title": "Markdown links in documentation indexes create a real smoke-check surface",
+      "top_keywords": [
+        "readme.md",
+        "documentation",
+        "indexes",
+        "links",
+        "markdown",
+        "real",
+        "surface",
+        "smoke-check",
+        "system_map.md",
+        "2026-07-29-documentation-smoke-checks-without-test-harness.md"
+      ]
+    },
+    {
       "date": "",
       "entity_type": "feature",
-      "path": "roadmap.json#initial-focus",
-      "slug": "initial-focus",
-      "status": "in-progress",
-      "summary": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
+      "path": "roadmap.json#establish-the-diagram-source-and-export-convention-canonical-excalidraw-files-with-github-viewable-svg-or-png-exports",
+      "slug": "establish-the-diagram-source-and-export-convention-canonical-excalidraw-files-with-github-viewable-svg-or-png-exports",
+      "status": "done",
+      "summary": "Establish the diagram source and export convention: canonical .excalidraw files with GitHub-viewable SVG or PNG exports",
       "tags": [],
-      "title": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
+      "title": "Establish the diagram source and export convention: canonical .excalidraw files with GitHub-viewable SVG or PNG exports",
       "top_keywords": [
-        "harmonization hub",
+        "visual architecture\nobjective",
+        "establish",
+        "diagram",
+        "source",
+        "export",
+        "convention",
+        "canonical",
+        "excalidraw",
+        "github-viewable",
+        "svg"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#build-the-three-schema-harmonization-flow-diagram",
+      "slug": "build-the-three-schema-harmonization-flow-diagram",
+      "status": "done",
+      "summary": "Build the three-schema harmonization flow diagram",
+      "tags": [],
+      "title": "Build the three-schema harmonization flow diagram",
+      "top_keywords": [
+        "visual architecture\nobjective",
+        "build",
+        "three-schema",
         "harmonization",
-        "pipeline",
-        "hub",
-        "survey",
-        "gmd",
-        "central",
-        "reference",
+        "flow",
+        "diagram",
+        "feature",
+        "milestone",
+        "visual",
+        "architecture"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#build-the-satellite-repository-dependency-diagram",
+      "slug": "build-the-satellite-repository-dependency-diagram",
+      "status": "done",
+      "summary": "Build the satellite repository dependency diagram",
+      "tags": [],
+      "title": "Build the satellite repository dependency diagram",
+      "top_keywords": [
+        "visual architecture\nobjective",
+        "build",
+        "satellite",
+        "repository",
+        "dependency",
+        "diagram",
+        "feature",
+        "milestone",
+        "visual",
+        "architecture"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#map-architecture-decisions-to-the-system-map-md-components-they-govern",
+      "slug": "map-architecture-decisions-to-the-system-map-md-components-they-govern",
+      "status": "done",
+      "summary": "Map architecture decisions to the system_map.md components they govern",
+      "tags": [],
+      "title": "Map architecture decisions to the system_map.md components they govern",
+      "top_keywords": [
+        "visual architecture\nobjective",
+        "architecture",
+        "map",
+        "decisions",
+        "system_map",
+        "components",
+        "govern",
+        "system_map.md",
+        "feature",
+        "milestone"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#write-the-its-collaborator-guide",
+      "slug": "write-the-its-collaborator-guide",
+      "status": "idea",
+      "summary": "Write the ITS collaborator guide",
+      "tags": [],
+      "title": "Write the ITS collaborator guide",
+      "top_keywords": [
+        "collaborator guidance",
+        "navigation\nobjective",
+        "collaborator",
+        "guide",
+        "feature",
+        "milestone",
+        "guidance",
+        "navigation",
+        "objective",
+        "close"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#write-the-regional-focal-point-guide",
+      "slug": "write-the-regional-focal-point-guide",
+      "status": "idea",
+      "summary": "Write the regional focal point guide",
+      "tags": [],
+      "title": "Write the regional focal point guide",
+      "top_keywords": [
+        "collaborator guidance",
+        "navigation\nobjective",
+        "regional",
+        "focal",
         "point",
-        "assisted"
+        "guide",
+        "feature",
+        "milestone",
+        "collaborator",
+        "guidance"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#improve-repository-navigation-so-new-readers-can-reach-the-right-document-in-under-a-minute",
+      "slug": "improve-repository-navigation-so-new-readers-can-reach-the-right-document-in-under-a-minute",
+      "status": "idea",
+      "summary": "Improve repository navigation so new readers can reach the right document in under a minute",
+      "tags": [],
+      "title": "Improve repository navigation so new readers can reach the right document in under a minute",
+      "top_keywords": [
+        "collaborator guidance",
+        "navigation\nobjective",
+        "navigation",
+        "improve",
+        "repository",
+        "readers",
+        "reach",
+        "right",
+        "document",
+        "under"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#add-concise-explanations-linked-to-live-satellite-repository-sources",
+      "slug": "add-concise-explanations-linked-to-live-satellite-repository-sources",
+      "status": "idea",
+      "summary": "Add concise explanations linked to live satellite repository sources",
+      "tags": [],
+      "title": "Add concise explanations linked to live satellite repository sources",
+      "top_keywords": [
+        "collaborator guidance",
+        "navigation\nobjective",
+        "concise",
+        "explanations",
+        "linked",
+        "live",
+        "satellite",
+        "repository",
+        "sources",
+        "feature"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#define-requirements-for-the-hosted-documentation-layer",
+      "slug": "define-requirements-for-the-hosted-documentation-layer",
+      "status": "idea",
+      "summary": "Define requirements for the hosted documentation layer",
+      "tags": [],
+      "title": "Define requirements for the hosted documentation layer",
+      "top_keywords": [
+        "hosted presentation\nobjective",
+        "hosted",
+        "define",
+        "requirements",
+        "documentation",
+        "layer",
+        "feature",
+        "milestone",
+        "presentation",
+        "objective"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#compare-quarto-website-and-mkdocs-material-against-those-requirements",
+      "slug": "compare-quarto-website-and-mkdocs-material-against-those-requirements",
+      "status": "idea",
+      "summary": "Compare Quarto website and MkDocs Material against those requirements",
+      "tags": [],
+      "title": "Compare Quarto website and MkDocs Material against those requirements",
+      "top_keywords": [
+        "compare quarto",
+        "hosted presentation\nobjective",
+        "compare",
+        "quarto",
+        "website",
+        "mkdocs",
+        "material",
+        "requirements",
+        "feature",
+        "milestone"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#implement-the-selected-hosted-presentation",
+      "slug": "implement-the-selected-hosted-presentation",
+      "status": "idea",
+      "summary": "Implement the selected hosted presentation",
+      "tags": [],
+      "title": "Implement the selected hosted presentation",
+      "top_keywords": [
+        "hosted presentation\nobjective",
+        "hosted",
+        "presentation",
+        "implement",
+        "selected",
+        "feature",
+        "milestone",
+        "objective",
+        "browsable",
+        "webpage"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#confirm-github-actions-outbound-network-permissions",
+      "slug": "confirm-github-actions-outbound-network-permissions",
+      "status": "idea",
+      "summary": "Confirm GitHub Actions outbound-network permissions",
+      "tags": [],
+      "title": "Confirm GitHub Actions outbound-network permissions",
+      "top_keywords": [
+        "maintenance\nobjective",
+        "confirm",
+        "github",
+        "actions",
+        "outbound-network",
+        "permissions",
+        "feature",
+        "milestone",
+        "currency",
+        "maintenance"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#build-mechanical-satellite-repository-status-sync",
+      "slug": "build-mechanical-satellite-repository-status-sync",
+      "status": "idea",
+      "summary": "Build mechanical satellite repository status sync",
+      "tags": [],
+      "title": "Build mechanical satellite repository status sync",
+      "top_keywords": [
+        "maintenance\nobjective",
+        "mechanical",
+        "build",
+        "satellite",
+        "repository",
+        "status",
+        "sync",
+        "feature",
+        "milestone",
+        "currency"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#confirm-the-ai-factory-key-interface",
+      "slug": "confirm-the-ai-factory-key-interface",
+      "status": "idea",
+      "summary": "Confirm the AI Factory key interface",
+      "tags": [],
+      "title": "Confirm the AI Factory key interface",
+      "top_keywords": [
+        "maintenance\nobjective",
+        "confirm",
+        "factory",
+        "interface",
+        "feature",
+        "milestone",
+        "currency",
+        "maintenance",
+        "objective",
+        "mechanical"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#design-assisted-narrative-refresh-only-after-the-interface-is-confirmed",
+      "slug": "design-assisted-narrative-refresh-only-after-the-interface-is-confirmed",
+      "status": "idea",
+      "summary": "Design assisted narrative refresh only after the interface is confirmed",
+      "tags": [],
+      "title": "Design assisted narrative refresh only after the interface is confirmed",
+      "top_keywords": [
+        "maintenance\nobjective",
+        "design",
+        "assisted",
+        "narrative",
+        "refresh",
+        "interface",
+        "confirmed",
+        "feature",
+        "milestone",
+        "currency"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#periodically-reconcile-ownership-rules-and-route-new-material-to-its-canonical-location",
+      "slug": "periodically-reconcile-ownership-rules-and-route-new-material-to-its-canonical-location",
+      "status": "idea",
+      "summary": "Periodically reconcile ownership rules and route new material to its canonical location",
+      "tags": [],
+      "title": "Periodically reconcile ownership rules and route new material to its canonical location",
+      "top_keywords": [
+        "maintenance\nobjective",
+        "periodically",
+        "reconcile",
+        "ownership",
+        "rules",
+        "route",
+        "material",
+        "canonical",
+        "location",
+        "feature"
       ]
     }
   ],
-  "entity_count": 4,
-  "generated": "2026-07-29",
+  "entity_count": 22,
+  "generated": "2026-07-30",
   "schema_version": "0.2.0",
-  "topic_count": 0,
-  "topics": []
+  "topic_count": 3,
+  "topics": [
+    {
+      "entity_count": 13,
+      "entity_paths": [
+        "roadmap.json#establish-the-diagram-source-and-export-convention-canonical-excalidraw-files-with-github-viewable-svg-or-png-exports",
+        "roadmap.json#build-the-three-schema-harmonization-flow-diagram",
+        "roadmap.json#build-the-satellite-repository-dependency-diagram",
+        "roadmap.json#map-architecture-decisions-to-the-system-map-md-components-they-govern",
+        "roadmap.json#write-the-its-collaborator-guide",
+        "roadmap.json#write-the-regional-focal-point-guide",
+        "roadmap.json#improve-repository-navigation-so-new-readers-can-reach-the-right-document-in-under-a-minute",
+        "roadmap.json#add-concise-explanations-linked-to-live-satellite-repository-sources",
+        "roadmap.json#confirm-github-actions-outbound-network-permissions",
+        "roadmap.json#build-mechanical-satellite-repository-status-sync",
+        "roadmap.json#confirm-the-ai-factory-key-interface",
+        "roadmap.json#design-assisted-narrative-refresh-only-after-the-interface-is-confirmed",
+        "roadmap.json#periodically-reconcile-ownership-rules-and-route-new-material-to-its-canonical-location"
+      ],
+      "keywords": [
+        "maintenance\nobjective",
+        "collaborator guidance",
+        "navigation\nobjective"
+      ],
+      "label": "Maintenance\nObjective / Collaborator Guidance / Navigation\nObjective",
+      "slug": "maintenance-objective-collaborator-guidance-navigation-objective"
+    },
+    {
+      "entity_count": 4,
+      "entity_paths": [
+        ".cg-docs/reviews/2026-07-29-incorporate-system-map-review.md",
+        ".cg-docs/reviews/2026-07-29-incorporate-system-map-verify-review.md",
+        ".cg-docs/solutions/testing-patterns/2026-07-29-documentation-smoke-checks-without-test-harness.md",
+        ".cg-docs/solutions/testing-patterns/2026-07-30-markdown-links-in-doc-indexes-enable-smoke-checks.md"
+      ],
+      "keywords": [
+        "readme.md",
+        "system_map.md",
+        "documentation"
+      ],
+      "label": "Readme.Md / System_Map.Md / Documentation",
+      "slug": "readme-md-system-map-md-documentation"
+    },
+    {
+      "entity_count": 3,
+      "entity_paths": [
+        "roadmap.json#define-requirements-for-the-hosted-documentation-layer",
+        "roadmap.json#compare-quarto-website-and-mkdocs-material-against-those-requirements",
+        "roadmap.json#implement-the-selected-hosted-presentation"
+      ],
+      "keywords": [
+        "hosted presentation\nobjective",
+        "hosted",
+        "requirements"
+      ],
+      "label": "Hosted Presentation\nObjective / Hosted / Requirements",
+      "slug": "hosted-presentation-objective-hosted-requirements"
+    }
+  ]
 }
