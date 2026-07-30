@@ -42,6 +42,10 @@ for unresolved items.
 [architecture decisions](architecture_decisions/) to understand what has
 already been settled and why.
 
+For a component-by-component orientation map, see
+[system_map.md](system_map.md). It is supporting documentation and does not
+override the canonical documents.
+
 ## Canonical documents
 
 Only the following three documents are canonical:
@@ -152,6 +156,7 @@ status is explicitly `Approved`.
 |   `-- 2026-07-29-initial-consolidation/
 |-- compound-gpid.md
 |-- compound-gpid.context.md
+|-- system_map.md
 |-- roadmap.json
 `-- sync_status/
 ```
@@ -175,6 +180,22 @@ consolidation.
    historical material that explains a decision.
 6. Keep generated HTML, PDF, DOCX, and presentation files outside the canonical
    directory. A render is never a source of truth.
+
+## Documentation smoke checks
+
+For navigation or link-oriented documentation changes, run a quick smoke check
+before merge:
+
+```sh
+test -f README.md
+test -f system_map.md
+test -f glossary_and_questions/glossary.md
+test -f glossary_and_questions/open_questions.md
+grep -n '\[system_map.md\](system_map.md)' README.md
+```
+
+For canonical-source edits, also run the Quarto render commands in the next
+section as a render smoke check.
 
 ## Rendering
 

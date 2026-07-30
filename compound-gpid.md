@@ -25,6 +25,8 @@ not perform harmonization itself.
 - A shared glossary of project terminology
 - A tracked list of open questions, moved into the decisions log once
   resolved
+- A supporting system components map (`system_map.md`) that explains how
+  pipeline pieces connect without overriding canonical architecture documents
 - Role specific guidance for collaborators such as regional focal points
   and ITS
 - Diagrams of the pipeline and repo relationships
@@ -54,3 +56,7 @@ conversations, code, or memory. The hub contains no pipeline code of its
 own. Its role is to explain, connect, and preserve the reasoning behind
 the system, so the project stays legible as it grows and as team
 membership changes.
+
+Alongside the canonical Quarto sources, the hub now includes
+`system_map.md` as a concise, component-level orientation artifact to help
+new collaborators follow end-to-end flow, composition, and handoffs.

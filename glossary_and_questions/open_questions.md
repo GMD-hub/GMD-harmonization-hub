@@ -21,6 +21,9 @@
   scattered across country folders and personal drives?
 - What is the full list of legacy surveys to include in the PoC historical
   database seed?
+- Should Raw Data Cleaning remain fully deterministic, or should it include
+  bounded agent assistance to detect file levels and structure in especially
+  messy surveys?
 - What does the AI Factory key actually connect to? An Anthropic
   compatible endpoint, Azure OpenAI Service, or a different OpenAI
   compatible gateway shape the design of any component that calls an LLM,
