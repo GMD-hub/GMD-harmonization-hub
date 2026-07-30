@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1580" viewBox="0 0 1280 1580" role="img" aria-labelledby="title desc">
+  <title id="title">Three-Schema Harmonization Flow (Draft)</title>
+  <desc id="desc">Supporting orientation diagram showing Schema 1, Schema 2, and Schema 3 in the human-approved deterministic harmonization flow.</desc>
+  <defs>
+    <style>
+      text { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; fill: #1f2933; }
+      .node { stroke: #1f2933; stroke-width: 2; }
+      .canonical { stroke-width: 2.5; }
+      .canonical-inner { stroke-width: 2; fill: none; }
+      .flow { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .advisory { stroke-dasharray: 8 6; }
+      .label { font-size: 24px; font-weight: 600; }
+      .small { font-size: 20px; font-weight: 500; }
+      .legend-title { font-size: 22px; font-weight: 700; }
+      .legend-item { font-size: 20px; }
+      .chip { font-size: 18px; font-weight: 600; fill: #334155; }
+      .title { font-size: 34px; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-size: 20px; fill: #334155; }
+      .source-note { font-size: 16px; fill: #475569; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" fill="#475569" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1280" height="1580" fill="#ffffff"/>
+
+  <text x="40" y="56" class="title">Three-Schema Harmonization Flow</text>
+  <text x="40" y="86" class="subtitle">Draft supporting orientation map. Canonical authority remains in canonical/system-architecture.qmd.</text>
+  <text x="40" y="112" class="source-note">Statuses shown: Approved, Proposed, Advisory.</text>
+
+  <rect class="node" x="40" y="150" rx="16" ry="16" width="300" height="90" fill="#FFF4CC"/>
+  <text class="label" x="190" y="190" text-anchor="middle">Questionnaire PDF</text>
+  <text class="small" x="190" y="220" text-anchor="middle">Source documentation</text>
+
+  <rect class="node" x="440" y="150" rx="16" ry="16" width="300" height="90" fill="#FFF4CC"/>
+  <text class="label" x="590" y="190" text-anchor="middle">Raw Survey Microdata</text>
+  <text class="small" x="590" y="220" text-anchor="middle">Source data</text>
+
+  <rect class="node" x="40" y="300" rx="16" ry="16" width="300" height="100" fill="#E8F4FF"/>
+  <text class="label" x="190" y="342" text-anchor="middle">Survey Profile</text>
+  <text class="small" x="190" y="372" text-anchor="middle">Schema 1 (Proposed)</text>
+
+  <rect class="node" x="440" y="300" rx="16" ry="16" width="300" height="100" fill="#ECEFF1"/>
+  <text class="label" x="590" y="342" text-anchor="middle">Raw Data Cleaning</text>
+  <text class="small" x="590" y="372" text-anchor="middle">Deterministic structure</text>
+
+  <rect class="node" x="440" y="450" rx="16" ry="16" width="300" height="100" fill="#E8F4FF"/>
+  <text class="label" x="590" y="492" text-anchor="middle">Raw Data Metadata</text>
+  <text class="small" x="590" y="522" text-anchor="middle">Profile facts</text>
+
+  <rect class="node" x="40" y="450" rx="16" ry="16" width="300" height="100" fill="#E8F4FF"/>
+  <text class="label" x="190" y="492" text-anchor="middle">Profile Reconciliation</text>
+  <text class="small" x="190" y="522" text-anchor="middle">Questionnaire vs data</text>
+
+  <rect class="node" x="40" y="600" rx="16" ry="16" width="300" height="100" fill="#E8F4FF"/>
+  <text class="label" x="190" y="642" text-anchor="middle">Reconciled Profile</text>
+  <text class="small" x="190" y="672" text-anchor="middle">Validated draft input</text>
+
+  <rect class="node canonical" x="440" y="600" rx="16" ry="16" width="300" height="110" fill="#E8F7EF"/>
+  <rect class="canonical-inner" x="452" y="612" rx="12" ry="12" width="276" height="86"/>
+  <text class="label" x="590" y="646" text-anchor="middle">Canonical GMD Schema</text>
+  <text class="small" x="590" y="676" text-anchor="middle">Schema 2 (Approved)</text>
+
+  <rect class="node" x="440" y="760" rx="16" ry="16" width="300" height="90" fill="#F4ECFF" stroke-dasharray="8 6"/>
+  <text class="label" x="590" y="800" text-anchor="middle">Historical Precedents</text>
+  <text class="small" x="590" y="830" text-anchor="middle">Advisory only</text>
+
+  <rect class="node" x="40" y="760" rx="16" ry="16" width="300" height="110" fill="#F4ECFF"/>
+  <text class="label" x="190" y="800" text-anchor="middle">Drafting Agent</text>
+  <text class="small" x="190" y="830" text-anchor="middle">Proposes; does not approve</text>
+
+  <rect class="node" x="40" y="920" rx="16" ry="16" width="300" height="110" fill="#E8F4FF"/>
+  <text class="label" x="190" y="962" text-anchor="middle">Harmonization Specification</text>
+  <text class="small" x="190" y="992" text-anchor="middle">Schema 3 (Draft -> Approved)</text>
+
+  <rect class="node" x="440" y="920" rx="16" ry="16" width="300" height="100" fill="#FFF1E3"/>
+  <text class="label" x="590" y="962" text-anchor="middle">Human Review Gate</text>
+  <text class="small" x="590" y="992" text-anchor="middle">Authority control</text>
+
+  <rect class="node" x="440" y="1080" rx="16" ry="16" width="300" height="100" fill="#ECEFF1"/>
+  <text class="label" x="590" y="1122" text-anchor="middle">Deterministic Engine</text>
+  <text class="small" x="590" y="1152" text-anchor="middle">Exact approved version</text>
+
+  <rect class="node" x="440" y="1220" rx="16" ry="16" width="300" height="100" fill="#ECEFF1"/>
+  <text class="label" x="590" y="1262" text-anchor="middle">QA and Validation</text>
+  <text class="small" x="590" y="1292" text-anchor="middle">Pass or return</text>
+
+  <rect class="node" x="40" y="1220" rx="16" ry="16" width="300" height="100" fill="#E8F5E9"/>
+  <text class="label" x="190" y="1262" text-anchor="middle">Outputs + Audit Trail</text>
+  <text class="small" x="190" y="1292" text-anchor="middle">Lineage record</text>
+
+  <path class="flow" d="M190 240 L190 300"/>
+  <path class="flow" d="M590 240 L590 300"/>
+  <path class="flow" d="M590 400 L590 450"/>
+  <path class="flow" d="M340 500 L440 500"/>
+  <path class="flow" d="M190 400 L190 450"/>
+  <path class="flow" d="M190 550 L190 600"/>
+  <path class="flow" d="M340 650 L440 650"/>
+  <path class="flow" d="M590 710 L340 790"/>
+  <path class="flow" d="M590 850 L340 790"/>
+  <path class="flow" d="M190 870 L190 920"/>
+  <path class="flow" d="M340 970 L440 970"/>
+  <path class="flow" d="M590 1020 L590 1080"/>
+  <path class="flow" d="M590 1180 L590 1220"/>
+  <path class="flow" d="M440 1270 L340 1270"/>
+  <path class="flow advisory" d="M490 1020 L340 790"/>
+  <path class="flow advisory" d="M440 1240 L420 990"/>
+
+  <text class="chip" x="478" y="1044">approved exact version</text>
+  <text class="chip" x="356" y="958">draft submission</text>
+  <text class="chip" x="306" y="1122">qa fail route</text>
+
+  <rect class="node" x="40" y="1360" rx="14" ry="14" width="700" height="170" fill="#ffffff" stroke="#334155"/>
+  <text class="legend-title" x="60" y="1398">Legend</text>
+  <text class="legend-item" x="60" y="1430">Solid arrow: verified flow</text>
+  <text class="legend-item" x="60" y="1460">Dashed arrow: advisory feedback</text>
+  <text class="legend-item" x="60" y="1490">Double border: canonical binding artifact (Schema 2)</text>
+  <text class="legend-item" x="60" y="1520">Status tags shown: Approved, Proposed, Advisory</text>
+
+  <rect class="node" x="770" y="180" rx="12" ry="12" width="460" height="340" fill="#ffffff" stroke="#334155"/>
+  <text x="796" y="218" class="legend-title">Semantic Colors</text>
+  <rect class="node" x="800" y="242" rx="8" ry="8" width="28" height="28" fill="#FFF4CC"/>
+  <text class="legend-item" x="840" y="263">Source/input artifact</text>
+  <rect class="node" x="800" y="282" rx="8" ry="8" width="28" height="28" fill="#E8F4FF"/>
+  <text class="legend-item" x="840" y="303">Survey/profile schema artifact</text>
+  <rect class="node" x="800" y="322" rx="8" ry="8" width="28" height="28" fill="#E8F7EF"/>
+  <text class="legend-item" x="840" y="343">Canonical rule artifact</text>
+  <rect class="node" x="800" y="362" rx="8" ry="8" width="28" height="28" fill="#F4ECFF"/>
+  <text class="legend-item" x="840" y="383">AI-assisted proposal or advisory input</text>
+  <rect class="node" x="800" y="402" rx="8" ry="8" width="28" height="28" fill="#FFF1E3"/>
+  <text class="legend-item" x="840" y="423">Human gate</text>
+  <rect class="node" x="800" y="442" rx="8" ry="8" width="28" height="28" fill="#ECEFF1"/>
+  <text class="legend-item" x="840" y="463">Deterministic execution/QA</text>
+  <rect class="node" x="800" y="482" rx="8" ry="8" width="28" height="28" fill="#E8F5E9"/>
+  <text class="legend-item" x="840" y="503">Output/audit artifact</text>
+</svg>
