@@ -2,15 +2,129 @@
   "schemaVersion": "compound-gpid-roadmap-v1",
   "milestones": [
     {
-      "id": "the-gmd-harmonization-hub-is",
-      "title": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
-      "objective": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline. It records how the canonical schema, the survey extraction pipeline, the historical precedent knowledge base, and the human review process fit together as a single system, and it explains the reasoning behind the major design decisions that shape that system. Its purpose is to let any team member, collaborator, or institutional partner understand the architecture of the pipeline and the responsibilities each repository and each person holds, without needing to reconstruct that understanding from scattered conversations, code, or memory. The hub contains no pipeline code of its own. Its role is to explain, connect, and preserve the reasoning behind the system, so the project stays legible as it grows and as team membership changes.",
-      "status": "in-progress",
+      "id": "visual-architecture",
+      "title": "Visual Architecture",
+      "objective": "Create editable diagrams that let unfamiliar collaborators understand the system quickly.",
+      "status": "planned",
       "features": [
         {
-          "id": "initial-focus",
-          "title": "The GMD Harmonization Hub is the central reference point for the AI assisted household survey harmonization pipeline.",
-          "status": "in-progress",
+          "id": "establish-the-diagram-source-and-export-convention-canonical-excalidraw-files-with-github-viewable-svg-or-png-exports",
+          "title": "Establish the diagram source and export convention: canonical .excalidraw files with GitHub-viewable SVG or PNG exports",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "build-the-three-schema-harmonization-flow-diagram",
+          "title": "Build the three-schema harmonization flow diagram",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "build-the-satellite-repository-dependency-diagram",
+          "title": "Build the satellite repository dependency diagram",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "map-architecture-decisions-to-the-system-map-md-components-they-govern",
+          "title": "Map architecture decisions to the system_map.md components they govern",
+          "status": "idea",
+          "plan": null
+        }
+      ]
+    },
+    {
+      "id": "collaborator-guidance-and-navigation",
+      "title": "Collaborator Guidance and Navigation",
+      "objective": "Close the main content gaps while keeping every claim tied to its authoritative source.",
+      "status": "planned",
+      "features": [
+        {
+          "id": "write-the-its-collaborator-guide",
+          "title": "Write the ITS collaborator guide",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "write-the-regional-focal-point-guide",
+          "title": "Write the regional focal point guide",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "improve-repository-navigation-so-new-readers-can-reach-the-right-document-in-under-a-minute",
+          "title": "Improve repository navigation so new readers can reach the right document in under a minute",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "add-concise-explanations-linked-to-live-satellite-repository-sources",
+          "title": "Add concise explanations linked to live satellite repository sources",
+          "status": "idea",
+          "plan": null
+        }
+      ]
+    },
+    {
+      "id": "hosted-presentation",
+      "title": "Hosted Presentation",
+      "objective": "Add a browsable webpage only after the underlying content and navigation are mature.",
+      "status": "planned",
+      "features": [
+        {
+          "id": "define-requirements-for-the-hosted-documentation-layer",
+          "title": "Define requirements for the hosted documentation layer",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "compare-quarto-website-and-mkdocs-material-against-those-requirements",
+          "title": "Compare Quarto website and MkDocs Material against those requirements",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "implement-the-selected-hosted-presentation",
+          "title": "Implement the selected hosted presentation",
+          "status": "idea",
+          "plan": null
+        }
+      ]
+    },
+    {
+      "id": "currency-and-maintenance",
+      "title": "Currency and Maintenance",
+      "objective": "Keep mechanical facts and explanatory content current without claiming unconfirmed infrastructure capabilities.",
+      "status": "planned",
+      "features": [
+        {
+          "id": "confirm-github-actions-outbound-network-permissions",
+          "title": "Confirm GitHub Actions outbound-network permissions",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "build-mechanical-satellite-repository-status-sync",
+          "title": "Build mechanical satellite repository status sync",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "confirm-the-ai-factory-key-interface",
+          "title": "Confirm the AI Factory key interface",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "design-assisted-narrative-refresh-only-after-the-interface-is-confirmed",
+          "title": "Design assisted narrative refresh only after the interface is confirmed",
+          "status": "idea",
+          "plan": null
+        },
+        {
+          "id": "periodically-reconcile-ownership-rules-and-route-new-material-to-its-canonical-location",
+          "title": "Periodically reconcile ownership rules and route new material to its canonical location",
+          "status": "idea",
           "plan": null
         }
       ]
