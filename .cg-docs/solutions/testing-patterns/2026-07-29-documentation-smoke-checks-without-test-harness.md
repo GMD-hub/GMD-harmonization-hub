@@ -68,5 +68,6 @@ quarto render canonical/infrastructure-requirements.qmd --to html \
 ## Related
 
 - `README.md` documentation smoke checks section.
+- `.cg-docs/solutions/testing-patterns/2026-07-30-markdown-links-in-doc-indexes-enable-smoke-checks.md`
 - `.cg-docs/reviews/2026-07-29-incorporate-system-map-review.md`
 - `.cg-docs/plans/2026-07-29-incorporate-system-map.md`

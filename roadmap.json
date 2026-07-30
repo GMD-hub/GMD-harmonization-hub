@@ -5,31 +5,31 @@
       "id": "visual-architecture",
       "title": "Visual Architecture",
       "objective": "Create editable diagrams that let unfamiliar collaborators understand the system quickly.",
-      "status": "planned",
+      "status": "done",
       "features": [
         {
           "id": "establish-the-diagram-source-and-export-convention-canonical-excalidraw-files-with-github-viewable-svg-or-png-exports",
           "title": "Establish the diagram source and export convention: canonical .excalidraw files with GitHub-viewable SVG or PNG exports",
-          "status": "idea",
-          "plan": null
+          "status": "done",
+          "plan": ".cg-docs/plans/2026-07-30-visual-architecture.md"
         },
         {
           "id": "build-the-three-schema-harmonization-flow-diagram",
           "title": "Build the three-schema harmonization flow diagram",
-          "status": "idea",
-          "plan": null
+          "status": "done",
+          "plan": ".cg-docs/plans/2026-07-30-visual-architecture.md"
         },
         {
           "id": "build-the-satellite-repository-dependency-diagram",
           "title": "Build the satellite repository dependency diagram",
-          "status": "idea",
-          "plan": null
+          "status": "done",
+          "plan": ".cg-docs/plans/2026-07-30-visual-architecture.md"
         },
         {
           "id": "map-architecture-decisions-to-the-system-map-md-components-they-govern",
           "title": "Map architecture decisions to the system_map.md components they govern",
-          "status": "idea",
-          "plan": null
+          "status": "done",
+          "plan": ".cg-docs/plans/2026-07-30-visual-architecture.md"
         }
       ]
     },

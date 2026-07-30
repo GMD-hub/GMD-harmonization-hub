@@ -1,6 +1,6 @@
 # 🧠 Project Brain
 
-_Generated 2026-07-29 · 4 entities · 0 topics · 1 edges_
+_Generated 2026-07-30 · 22 entities · 3 topics · 2 edges_
 
 ## How to Use
 
@@ -13,20 +13,24 @@ _Generated 2026-07-29 · 4 entities · 0 topics · 1 edges_
 
 | # | Topic | Entities | File |
 |---|-------|----------|------|
+| 1 | [Maintenance Objective / Collaborator Guidance / Navigation Objective](BRAIN-01.md#maintenance-objective-collaborator-guidance-navigation-objective) | 13 | BRAIN-01.md |
+| 2 | [Readme.Md / System_Map.Md / Documentation](BRAIN-01.md#readme-md-system-map-md-documentation) | 4 | BRAIN-01.md |
+| 3 | [Hosted Presentation Objective / Hosted / Requirements](BRAIN-01.md#hosted-presentation-objective-hosted-requirements) | 3 | BRAIN-01.md |
 
 ## Entity Summary
 
 | Type | Count |
 |------|-------|
-| feature | 1 |
-| plan | 1 |
-| review | 1 |
-| solution | 1 |
+| feature | 16 |
+| plan | 2 |
+| review | 2 |
+| solution | 2 |
 
-_4 entities not assigned to any topic_
+_2 entities not assigned to any topic_
 
 ## Relationship Summary
 
 | Edge Type | Count |
 |-----------|-------|
 | reviews | 1 |
+| verifies | 1 |

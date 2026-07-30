@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Satellite Repository Dependency Map (Draft)</title>
+  <desc id="desc">Supporting diagram showing verified repository relationships and unresolved ownership or URL assignments.</desc>
+  <defs>
+    <style>
+      text { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; fill: #1f2933; }
+      .node { stroke: #1f2933; stroke-width: 2; }
+      .flow { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .dashed { stroke-dasharray: 8 6; }
+      .open { stroke: #991b1b; }
+      .title { font-size: 34px; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-size: 20px; fill: #334155; }
+      .label { font-size: 24px; font-weight: 600; }
+      .small { font-size: 20px; font-weight: 500; }
+      .legend-title { font-size: 22px; font-weight: 700; }
+      .legend-item { font-size: 19px; }
+      .chip { font-size: 17px; font-weight: 600; fill: #334155; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" fill="#475569" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="900" fill="#ffffff"/>
+
+  <text x="40" y="58" class="title">Satellite Repository Dependency Map</text>
+  <text x="40" y="88" class="subtitle">Draft supporting map based on README and canonical architecture boundaries.</text>
+
+  <rect class="node" x="450" y="120" rx="16" ry="16" width="500" height="130" fill="#E8F4FF"/>
+  <text class="label" x="700" y="170" text-anchor="middle">GMD-harmonization-hub</text>
+  <text class="small" x="700" y="205" text-anchor="middle">Architecture and governance docs only</text>
+
+  <rect class="node" x="80" y="360" rx="16" ry="16" width="350" height="120" fill="#E8F7EF"/>
+  <text class="label" x="255" y="408" text-anchor="middle">GMD-canonical-schema</text>
+  <text class="small" x="255" y="443" text-anchor="middle">Binding variable rules</text>
+
+  <rect class="node" x="520" y="360" rx="16" ry="16" width="350" height="120" fill="#E8F4FF"/>
+  <text class="label" x="695" y="408" text-anchor="middle">harmonization-specs</text>
+  <text class="small" x="695" y="443" text-anchor="middle">Survey-specific mapping specs</text>
+
+  <rect class="node" x="960" y="360" rx="16" ry="16" width="350" height="120" fill="#E8F4FF"/>
+  <text class="label" x="1135" y="408" text-anchor="middle">survey-scribe</text>
+  <text class="small" x="1135" y="443" text-anchor="middle">Document extraction</text>
+
+  <rect class="node" x="520" y="560" rx="16" ry="16" width="350" height="120" fill="#F4ECFF" stroke-dasharray="8 6"/>
+  <text class="label" x="695" y="608" text-anchor="middle">GMD-KnowledgeBase-Pilot</text>
+  <text class="small" x="695" y="643" text-anchor="middle">Historical, non-production</text>
+
+  <rect class="node open" x="80" y="560" rx="16" ry="16" width="350" height="120" fill="#FFE8E8" stroke-dasharray="2 6"/>
+  <text class="label" x="255" y="605" text-anchor="middle" fill="#991b1b">Open Assignments</text>
+  <text class="small" x="255" y="640" text-anchor="middle" fill="#991b1b">Physical URLs and named owners unresolved</text>
+
+  <path class="flow dashed" d="M700 250 L255 360"/>
+  <path class="flow dashed" d="M700 250 L695 360"/>
+  <path class="flow dashed" d="M700 250 L1135 360"/>
+  <path class="flow" d="M430 420 L520 420"/>
+  <path class="flow dashed" d="M960 420 L870 420"/>
+  <path class="flow dashed" d="M695 560 L695 480"/>
+
+  <text class="chip" x="410" y="402">canonical constraints</text>
+  <text class="chip" x="875" y="402">advisory profile context</text>
+  <text class="chip" x="718" y="525">historical pilot context only</text>
+
+  <rect class="node" x="960" y="560" rx="14" ry="14" width="350" height="270" fill="#ffffff" stroke="#334155"/>
+  <text x="990" y="598" class="legend-title">Legend</text>
+  <text x="990" y="634" class="legend-item">Solid arrow: verified dependency</text>
+  <text x="990" y="668" class="legend-item">Dashed arrow: documentation/history relation</text>
+  <text x="990" y="702" class="legend-item">Dotted border: unresolved physical assignment</text>
+  <text x="990" y="736" class="legend-item">Purple node: historical, non-production context</text>
+  <text x="990" y="770" class="legend-item">Hub remains non-runtime documentation repo</text>
+
+  <text x="40" y="840" class="small" fill="#475569">Source basis: README repo map and canonical system architecture ownership boundaries.</text>
+</svg>
