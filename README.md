@@ -10,6 +10,38 @@ This repository contains architecture, governance, interface contracts, and
 decision rationale. It contains no pipeline code and no raw or harmonized
 microdata.
 
+## Repo map
+
+The following is a working navigation map compiled from project materials. It
+describes the intended role of each repository, but it is not an approved
+ownership register. Physical repository URLs and accountable methodological,
+technical, and support owners remain open until they are confirmed in the
+canonical architecture and implementation handoff.
+
+| Repository | Role in the system |
+|---|---|
+| `GMD-canonical-schema` | The authoritative GMD schema and harmonization rulebook. It governs how GMD variables are defined and built. |
+| `survey-scribe` | Extracts structured survey profiles from raw questionnaire PDFs and related documentation. |
+| `harmonization-specs` | Holds per-survey, per-variable harmonization decisions that are drafted with AI and approved by humans. |
+| `GMD-KnowledgeBase-Pilot` | An exploratory pilot that informed the CVS design; it is historical and is not part of the production pipeline. |
+| `GMD-harmonization-hub` | This repository: it explains how the system fits together and preserves its architecture and reasoning. |
+
+## Start here
+
+**New to the team.** Read the [glossary](glossary_and_questions/glossary.md),
+then review the repo map and the canonical documents below.
+
+**A regional focal point.** See [guidance for collaborators](for_collaborators/)
+for the role of methodological rules and decisions before they reach the CVS.
+
+**ITS.** See [guidance for collaborators](for_collaborators/) for a plain-language
+summary of infrastructure needs, and review the [open questions](glossary_and_questions/open_questions.md)
+for unresolved items.
+
+**A GPID teammate joining the project.** Start with the
+[architecture decisions](architecture_decisions/) to understand what has
+already been settled and why.
+
 ## Canonical documents
 
 Only the following three documents are canonical:
@@ -30,12 +62,12 @@ absent from the canonical documents.
 When sources disagree, use this order:
 
 1. Approved GMD methodology and the canonical GMD schema govern statistical
-	definitions and validation rules.
+   definitions and validation rules.
 2. `canonical/system-architecture.qmd` governs system behavior, roles,
-	approval gates, and artifact contracts.
+   approval gates, and artifact contracts.
 3. `canonical/infrastructure-requirements.qmd` governs infrastructure
-	capabilities and records whether implementation choices are approved or
-	only proposed.
+   capabilities and records whether implementation choices are approved or
+   only proposed.
 4. Approved, quality-assured historical decisions are advisory precedents.
 5. Archived documents provide context only and have no current authority.
 
@@ -46,17 +78,17 @@ must never be handled through an implicit fallback.
 
 ```mermaid
 flowchart LR
-	 S[Canonical GMD schema] --> D[AI-assisted draft]
-	 P[Survey profile] --> D
-	 Q[Structured documentation] --> D
-	 H[Approved precedents] --> D
-	 D --> R[Human review]
-	 R -->|approved immutable version| E[Deterministic execution]
-	 R -->|rejected with reasons| D
-	 E --> V[Quality assurance]
-	 V -->|pass| O[Outputs and audit record]
-	 V -->|failure| R
-	 O -->|reviewed precedent admission| H
+    S[Canonical GMD schema] --> D[AI-assisted draft]
+    P[Survey profile] --> D
+    Q[Structured documentation] --> D
+    H[Approved precedents] --> D
+    D --> R[Human review]
+    R -->|approved immutable version| E[Deterministic execution]
+    R -->|rejected with reasons| D
+    E --> V[Quality assurance]
+    V -->|pass| O[Outputs and audit record]
+    V -->|failure| R
+    O -->|reviewed precedent admission| H
 ```
 
 The central control rule is simple: AI may draft and diagnose, but it cannot
@@ -82,8 +114,16 @@ This hub does not own:
 - implementation-specific runbooks maintained by component owners.
 
 The physical repositories and named owners for implementation components have
-not yet been recorded. That gap is explicit in the architecture document and
-should be resolved before implementation responsibilities are assigned.
+not yet been formally recorded. That gap is explicit in the architecture
+document and should be resolved before implementation responsibilities are
+assigned.
+
+## What this repository does not contain
+
+No harmonization rules, pipeline code, survey files, or respondent-level data
+are stored here. Those belong in the appropriate satellite repositories and
+controlled systems. This hub explains and connects the system; it does not
+decide statistical methodology or execute harmonization runs.
 
 ## Document status vocabulary
 
@@ -104,29 +144,37 @@ status is explicitly `Approved`.
 |-- canonical/
 |   |-- system-architecture.qmd
 |   `-- infrastructure-requirements.qmd
+|-- architecture_decisions/
+|-- diagrams/
+|-- for_collaborators/
+|-- glossary_and_questions/
 |-- archive/
 |   `-- 2026-07-29-initial-consolidation/
 |-- compound-gpid.md
 |-- compound-gpid.context.md
-`-- roadmap.json
+|-- roadmap.json
+`-- sync_status/
 ```
 
-The Compound GPID files and roadmap are workflow metadata, not GMD system
-documentation. The dated archive preserves the drafts, presentations,
-rendered outputs, and assets that informed the first canonical consolidation.
+The architecture decisions, collaborator guidance, glossary, open questions,
+diagrams, and synchronization notes support the canonical documents but do not
+override them. The Compound GPID files and roadmap are workflow metadata, not
+GMD system documentation. The dated archive preserves the drafts,
+presentations, rendered outputs, and assets that informed the first canonical
+consolidation.
 
 ## Maintenance policy
 
 1. Update the appropriate canonical document before updating an adaptation.
 2. Record unresolved matters as `Open`; do not write proposed behavior as fact.
 3. Any change to a system invariant, approval gate, trust boundary, or artifact
-	contract requires review by the relevant methodological and technical owners.
+   contract requires review by the relevant methodological and technical owners.
 4. Give stakeholder adaptations a date and audience, and derive them from the
-	canonical sources.
+   canonical sources.
 5. Move superseded sources and renders into a dated archive. Do not delete
-	historical material that explains a decision.
+   historical material that explains a decision.
 6. Keep generated HTML, PDF, DOCX, and presentation files outside the canonical
-	directory. A render is never a source of truth.
+   directory. A render is never a source of truth.
 
 ## Rendering
 
@@ -134,9 +182,9 @@ Quarto is required to render the canonical sources. From the repository root:
 
 ```sh
 quarto render canonical/system-architecture.qmd --to html \
-	--output-dir ../build -M embed-resources:true
+    --output-dir ../build -M embed-resources:true
 quarto render canonical/infrastructure-requirements.qmd --to html \
-	--output-dir ../build -M embed-resources:true
+    --output-dir ../build -M embed-resources:true
 ```
 
 Quarto resolves `--output-dir` relative to the input document, so these commands
